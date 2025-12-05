@@ -398,7 +398,8 @@
 
         .benefits-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            /* FIX: Reduced minmax to 240px to ensure 4 cards fit on 1200px container */
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 30px;
         }
 
@@ -876,10 +877,7 @@
             </div>
             <div class="hero-image-wrapper reveal-on-scroll parallax-img" data-parallax-speed="0.05" style="transition-delay: 0.2s;">
                 <img src="smart-splash-hero.webp" alt="SmartSplash Silicone Sink Splash Guard on a modern kitchen sink" loading="eager" class="wiggle-img wiggle-delay-1">
-                <div class="floating-badge">
-                    <div class="icon-check">✓</div>
-                    <span>Fits Most Standard Sinks</span>
-                </div>
+                <!-- Removed duplicate floating badge -->
             </div>
         </div>
     </section>
