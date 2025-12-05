@@ -1,0 +1,4225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartSplash™ Silicone Sink Splash Guard - Stop Wet Shirts & Floors</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-bg: #F0F4F8; /* "Cool Mist" - slightly darker to show particles */
+            --color-surface: #FFFFFF;
+            --color-text-main: #1D1D1F;
+            --color-text-muted: #86868B;
+            --color-accent: #0891B2; /* Sophisticated Deep Teal - "The Shade" */
+            --color-accent-glow: rgba(8, 145, 178, 0.25);
+            --color-dark: #151516;
+            
+            --font-heading: 'Space Grotesk', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            
+            /* Apple-style "smooth" easing */
+            --ease-out-expo: cubic-bezier(0.165, 0.84, 0.44, 1);
+            --container-width: 1200px;
+            --header-height: 80px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F0F4F8;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 5px;
+            border: 2px solid #F0F4F8;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8;
+        }
+
+        /* Custom Selection Color */
+        ::selection {
+            background: rgba(6, 182, 212, 0.2);
+            color: var(--color-dark);
+        }
+
+        body {
+            background-color: var(--color-bg);
+            color: var(--color-text-main);
+            font-family: var(--font-body);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: 0.3s;
+        }
+
+        ul { list-style: none; }
+        img { max-width: 100%; display: block; }
+
+        /* UTILITIES */
+        .container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 32px;
+            font-weight: 600;
+            border-radius: 100px;
+            transition: all 0.4s var(--ease-out-expo);
+            cursor: pointer;
+            font-size: 1rem;
+            letter-spacing: 0.01em;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 32px;
+            font-weight: 600;
+            border-radius: 100px;
+            transition: transform 0.25s var(--ease-out-expo), box-shadow 0.25s var(--ease-out-expo), background 0.25s ease-out;
+            cursor: pointer;
+            font-size: 1rem;
+            letter-spacing: 0.01em;
+            background: linear-gradient(135deg, var(--color-dark), #020617);
+            color: white;
+            /* Enhanced shadow with inner bevel for tactile depth */
+            box-shadow:
+                0 4px 20px rgba(15, 23, 42, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08),
+                inset 0 -1px 2px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+            transform: translateX(-120%);
+            transition: 0.6s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px) scale(1.02);
+            /* Enhanced hover shadow with preserved bevel */
+            box-shadow:
+                0 12px 40px rgba(15, 23, 42, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                inset 0 -1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary:hover::after {
+            transform: translateX(120%);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--color-dark);
+            border: 2px solid rgba(15, 23, 42, 0.2);
+            backdrop-filter: blur(4px);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--color-dark);
+            background: rgba(15, 23, 42, 0.05);
+            transform: translateY(-2px);
+        }
+
+        /* Accessible focus states */
+        .btn:focus-visible,
+        .thumb:focus-visible,
+        .color-opt:focus-visible {
+            outline: 2px solid var(--color-accent);
+            outline-offset: 3px;
+        }
+
+        /* Make sure interactive gallery/color elements show pointer */
+        .thumb,
+        .color-opt {
+            cursor: pointer;
+        }
+
+        /* ANIMATIONS */
+        /* COOLER 3D REVEAL ANIMATION */
+        .reveal-on-scroll {
+            opacity: 0;
+            /* Start slightly rotated, pushed back, and blurred for cinematic depth */
+            transform: perspective(1000px) rotateX(10deg) translateY(30px) scale(0.95);
+            filter: blur(4px);
+            transition:
+                opacity 0.8s ease-out,
+                transform 0.8s var(--ease-out-expo),
+                filter 0.8s ease-out;
+            will-change: opacity, transform, filter;
+        }
+
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: perspective(1000px) rotateX(0) translateY(0) scale(1);
+            filter: blur(0);
+        }
+
+        /* HEADER - Frosted Glass / Condensation Effect */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            z-index: 100;
+            transition: all 0.4s ease-out;
+            display: flex;
+            align-items: center;
+            /* Initial state - subtle frosted glass */
+            background: linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 0.7) 0%,
+                rgba(240, 250, 255, 0.5) 50%,
+                rgba(220, 245, 255, 0.4) 100%
+            );
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        /* Condensation overlay - subtle water droplet texture */
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                /* Tiny condensation dots scattered across */
+                radial-gradient(circle at 15% 30%, rgba(200, 230, 250, 0.4) 0%, transparent 2px),
+                radial-gradient(circle at 35% 70%, rgba(180, 220, 245, 0.35) 0%, transparent 3px),
+                radial-gradient(circle at 55% 20%, rgba(190, 225, 250, 0.3) 0%, transparent 2px),
+                radial-gradient(circle at 75% 60%, rgba(200, 235, 255, 0.4) 0%, transparent 2.5px),
+                radial-gradient(circle at 90% 40%, rgba(185, 220, 245, 0.35) 0%, transparent 2px),
+                radial-gradient(circle at 25% 50%, rgba(195, 230, 252, 0.3) 0%, transparent 1.5px),
+                radial-gradient(circle at 65% 80%, rgba(200, 230, 250, 0.25) 0%, transparent 2px),
+                radial-gradient(circle at 45% 45%, rgba(210, 240, 255, 0.35) 0%, transparent 3px),
+                radial-gradient(circle at 85% 75%, rgba(190, 225, 250, 0.3) 0%, transparent 2px),
+                radial-gradient(circle at 10% 85%, rgba(200, 235, 255, 0.4) 0%, transparent 2.5px);
+            opacity: 0.6;
+            pointer-events: none;
+            z-index: -1;
+            animation: condensationShimmer 8s ease-in-out infinite;
+        }
+
+        /* Frosted glass edge highlight */
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.6) 20%,
+                rgba(200, 230, 250, 0.4) 50%,
+                rgba(255, 255, 255, 0.6) 80%,
+                transparent 100%
+            );
+            opacity: 0.8;
+        }
+
+        @keyframes condensationShimmer {
+            0%, 100% {
+                opacity: 0.5;
+                transform: translateY(0);
+            }
+            50% {
+                opacity: 0.7;
+                transform: translateY(0.5px);
+            }
+        }
+
+        header.scrolled {
+            background: linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 0.92) 0%,
+                rgba(245, 252, 255, 0.88) 50%,
+                rgba(235, 248, 255, 0.85) 100%
+            );
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow:
+                0 4px 20px rgba(8, 145, 178, 0.08),
+                0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        header.scrolled::before {
+            opacity: 0.8;
+        }
+
+        header.scrolled::after {
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(8, 145, 178, 0.2) 20%,
+                rgba(6, 182, 212, 0.15) 50%,
+                rgba(8, 145, 178, 0.2) 80%,
+                transparent 100%
+            );
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .logo {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-dark);
+            letter-spacing: -0.03em;
+            transition: transform 0.25s var(--ease-out-expo), text-shadow 0.25s ease-out, letter-spacing 0.25s ease-out;
+        }
+
+        .logo:hover {
+            transform: translateY(-1px);
+            letter-spacing: -0.01em;
+            text-shadow: 0 4px 12px rgba(15, 23, 42, 0.35);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+        }
+
+        .nav-links a {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--color-text-main);
+            position: relative;
+            letter-spacing: 0.01em;
+            transition: color 0.3s, letter-spacing 0.3s var(--ease-out-expo);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--color-accent);
+            transition: width 0.3s var(--ease-out-expo);
+        }
+
+        .nav-links a:hover {
+            color: var(--color-accent);
+            letter-spacing: 0.04em; /* Subtle letter-spacing expansion on hover */
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* HERO - Organic splash-style background with puddle effect at bottom */
+        .hero {
+            padding-top: calc(var(--header-height) + 60px);
+            padding-bottom: 80px;
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: visible; /* Allow splash to extend slightly */
+            /* Main background - light teal wash at top, fading to white toward bottom */
+            background:
+                /* Top-heavy teal wash - more intense at top */
+                radial-gradient(ellipse 90% 40% at 30% 15%, rgba(6, 182, 212, 0.18), transparent 60%),
+                radial-gradient(ellipse 70% 35% at 75% 25%, rgba(8, 145, 178, 0.14), transparent 55%),
+                radial-gradient(ellipse 100% 50% at 50% 20%, rgba(6, 182, 212, 0.10), transparent 70%),
+                /* Subtle scattered puddles */
+                radial-gradient(ellipse 40% 25% at 15% 40%, rgba(6, 182, 212, 0.08), transparent 50%),
+                radial-gradient(ellipse 35% 30% at 85% 50%, rgba(8, 145, 178, 0.06), transparent 50%),
+                /* Base gradient - light teal at top transitioning to near-white */
+                linear-gradient(180deg,
+                    rgba(224, 242, 248, 1) 0%,
+                    rgba(235, 246, 250, 1) 30%,
+                    rgba(245, 250, 252, 1) 60%,
+                    rgba(255, 255, 255, 1) 100%
+                );
+        }
+
+        /* Top blob decoration - DEEPER INTENSITY */
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -15%;
+            left: -10%;
+            width: 70%;
+            height: 55%;
+            background: radial-gradient(ellipse at center, rgba(6, 182, 212, 0.18), transparent 65%);
+            border-radius: 60% 40% 70% 30% / 50% 60% 40% 50%;
+            filter: blur(50px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Right side blob decoration - DEEPER INTENSITY */
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: -5%;
+            right: -15%;
+            width: 60%;
+            height: 50%;
+            background: radial-gradient(ellipse at center, rgba(8, 145, 178, 0.15), transparent 60%);
+            border-radius: 40% 60% 30% 70% / 60% 40% 60% 40%;
+            filter: blur(55px);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* WATER SPLASH PUDDLE at bottom of hero - organic irregular edge */
+        .hero-splash-puddle {
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 180px;
+            pointer-events: none;
+            z-index: 2;
+            overflow: visible;
+        }
+        
+        .hero-splash-puddle svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-text h1 {
+            font-size: 4.5rem;
+            line-height: 1.35; /* Increased vertical spacing between lines */
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, var(--color-dark) 0%, #4B5563 100%);
+            background-size: 100% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            /* Subtle ambient glow animation */
+            animation: subtleGlow 4s ease-in-out infinite;
+            position: relative;
+            transition: background-size 0.3s ease-out;
+        }
+
+        /* Shimmer overlay on hover - organic puddle-shaped light reflection */
+        .hero-text h1::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120%;
+            height: 130%;
+            transform: translate(-50%, -50%);
+            /* Soft radial glow - single blob */
+            background: radial-gradient(
+                ellipse 60% 70% at 50% 50%,
+                rgba(255, 255, 255, 0.45) 0%,
+                rgba(6, 182, 212, 0.3) 25%,
+                rgba(255, 255, 255, 0.2) 45%,
+                rgba(6, 182, 212, 0.15) 65%,
+                transparent 85%
+            );
+            pointer-events: none;
+            opacity: 0;
+            mix-blend-mode: overlay;
+            filter: blur(8px);
+            /* Organic puddle/blob shape using clip-path polygon */
+            clip-path: polygon(
+                15% 20%,
+                25% 8%,
+                45% 12%,
+                60% 5%,
+                78% 15%,
+                88% 10%,
+                95% 25%,
+                92% 45%,
+                98% 60%,
+                90% 78%,
+                82% 92%,
+                65% 88%,
+                50% 95%,
+                35% 90%,
+                20% 95%,
+                8% 82%,
+                5% 65%,
+                10% 45%,
+                4% 30%
+            );
+        }
+
+        .hero-text:hover h1::before {
+            animation: shimmerPuddle 2s ease-in-out;
+        }
+
+        @keyframes shimmerPuddle {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+                filter: blur(12px);
+            }
+            30% {
+                opacity: 0.9;
+                transform: translate(-50%, -50%) scale(1.05);
+                filter: blur(6px);
+            }
+            60% {
+                opacity: 0.7;
+                filter: blur(8px);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(1.15);
+                filter: blur(14px);
+            }
+        }
+
+        @keyframes subtleGlow {
+            0%, 100% {
+                filter: drop-shadow(0 0 0px rgba(8, 145, 178, 0));
+                text-shadow: none;
+            }
+            50% {
+                filter: drop-shadow(0 0 20px rgba(8, 145, 178, 0.15));
+            }
+        }
+
+        .hero-text p {
+            font-size: 1.25rem;
+            color: var(--color-text-muted);
+            margin-bottom: 40px;
+            max-width: 520px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 16px;
+        }
+
+        .hero-image-wrapper {
+            position: relative;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            transform: perspective(1000px) rotateY(-5deg);
+            transition: transform 0.5s ease-out, box-shadow 0.5s ease-out;
+            will-change: transform;
+            z-index: 0;
+        }
+
+        /* soft glow behind product */
+        .hero-image-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: 10%;
+            border-radius: inherit;
+            background: radial-gradient(circle at 30% 0%, rgba(6, 182, 212, 0.30), transparent 60%);
+            filter: blur(18px);
+            z-index: -1;
+        }
+        
+        .hero-image-wrapper:hover {
+            transform: perspective(1000px) rotateY(0deg) translateY(-4px);
+            box-shadow: 0 26px 70px rgba(15, 23, 42, 0.35);
+        }
+
+        .hero-image-wrapper img {
+            width: 102%;
+            max-width: none;
+            height: auto;
+            display: block;
+            /* Slight overscan so no sub-pixel gap can appear at container edges */
+            transform: none;
+            transition: none;
+            margin-left: -1%;
+        }
+
+        .hero-image-wrapper:hover img {
+            /* Very subtle scale on hover - barely perceptible */
+            transform: scale(1.01);
+            transition: transform 0.8s ease-out;
+        }
+
+        .floating-badge {
+            position: absolute;
+            top: 40px;
+            right: -20px;
+            background: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .icon-check {
+            width: 20px;
+            height: 20px;
+            background: var(--color-accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* PROBLEM / SOLUTION - Organic splash background */
+        .problem-solution {
+            padding: 100px 0;
+            position: relative;
+            overflow: hidden;
+            /* Ambient inner shadow for depth */
+            box-shadow: inset 0 20px 40px -20px rgba(6, 182, 212, 0.05);
+            /* Multi-layered splash effect */
+            background:
+                /* Soft water stains */
+                radial-gradient(ellipse 70% 50% at 5% 30%, rgba(255, 255, 255, 0.9), transparent 60%),
+                radial-gradient(ellipse 50% 70% at 95% 70%, rgba(240, 253, 250, 0.8), transparent 55%),
+                radial-gradient(ellipse 80% 40% at 50% 0%, rgba(207, 250, 254, 0.3), transparent 50%),
+                /* Base white with slight gradient */
+                linear-gradient(175deg, #FFFFFF 0%, #FAFEFE 50%, #F5FCFC 100%);
+        }
+
+        .problem-solution::before {
+            content: '';
+            position: absolute;
+            top: -5%;
+            left: 20%;
+            width: 40%;
+            height: 30%;
+            background: radial-gradient(ellipse at center, rgba(6, 182, 212, 0.04), transparent 70%);
+            border-radius: 50% 50% 60% 40% / 40% 60% 40% 60%;
+            filter: blur(30px);
+            pointer-events: none;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .comp-card {
+            background: var(--color-bg);
+            border-radius: 24px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            /* Immediate parallax - no transition delay, moves in sync with scroll */
+            will-change: transform;
+            /* No transition on transform - parallax should be instant with scroll */
+        }
+
+        .comp-card.problem {
+            border: 1px solid #FECACA;
+        }
+
+        .comp-card.solution {
+            border: 1px solid #CFFAFE;
+            background: linear-gradient(135deg, #F0FDFA 0%, #FFFFFF 100%);
+        }
+
+        /* Section-level blur effect - slow and smooth */
+        .problem-solution {
+            will-change: filter;
+            transition: filter 0.8s ease-out;
+        }
+
+        .problem-solution.is-section-blurring {
+            filter: blur(1.5px);
+        }
+
+        .comp-header {
+            margin-bottom: 24px;
+        }
+
+        .comp-tag {
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .problem .comp-tag { color: #EF4444; }
+        .solution .comp-tag { color: var(--color-accent); }
+
+        .comp-img {
+            border-radius: 16px;
+            overflow: hidden;
+            margin-top: 24px;
+            height: 300px;
+        }
+        
+        .comp-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* BENEFITS - Splash puddle background */
+        .benefits {
+            padding: 100px 0;
+            position: relative;
+            overflow: hidden;
+            /* Ambient inner shadow for depth */
+            box-shadow: inset 0 30px 60px -30px rgba(15, 23, 42, 0.03);
+            /* Organic water-like gradients */
+            background:
+                /* Top left splash */
+                radial-gradient(ellipse 60% 45% at 10% 20%, rgba(6, 182, 212, 0.08), transparent 65%),
+                /* Bottom right puddle */
+                radial-gradient(ellipse 55% 60% at 90% 85%, rgba(8, 145, 178, 0.06), transparent 60%),
+                /* Center wash */
+                radial-gradient(ellipse 90% 50% at 50% 50%, rgba(240, 244, 248, 0.5), transparent 70%),
+                /* Scattered micro-puddles */
+                radial-gradient(ellipse 20% 25% at 30% 70%, rgba(6, 182, 212, 0.04), transparent 50%),
+                radial-gradient(ellipse 25% 20% at 70% 30%, rgba(8, 145, 178, 0.03), transparent 50%),
+                /* Base */
+                linear-gradient(170deg, #F0F4F8 0%, #EDF2F7 50%, #E8EEF4 100%);
+        }
+
+        .benefits::before {
+            content: '';
+            position: absolute;
+            bottom: 10%;
+            left: -5%;
+            width: 35%;
+            height: 40%;
+            background: radial-gradient(ellipse at center, rgba(6, 182, 212, 0.05), transparent 65%);
+            border-radius: 70% 30% 50% 50% / 50% 50% 70% 30%;
+            filter: blur(35px);
+            pointer-events: none;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto 60px;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Subtle accent line that animates in when section header reveals */
+        .section-header h2::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: -8px;
+            width: 72px;
+            height: 3px;
+            background: linear-gradient(90deg, rgba(6, 182, 212, 0.7), rgba(8, 145, 178, 0.08));
+            border-radius: 999px;
+            transform: translateX(-50%) scaleX(0.4);
+            transform-origin: center;
+            opacity: 0;
+            transition: transform 0.6s var(--ease-out-expo), opacity 0.6s ease-out;
+        }
+
+        .section-header.reveal-on-scroll.is-visible h2::after {
+            opacity: 1;
+            transform: translateX(-50%) scaleX(1);
+        }
+
+        .benefits-grid {
+            display: grid;
+            /* FIX: Reduced minmax to 240px to ensure 4 cards fit on 1200px container */
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 30px;
+        }
+
+        .benefit-card {
+            background: white;
+            padding: 32px;
+            border-radius: 20px;
+            border: 1px solid transparent;
+            /* Enhanced base shadow for "floating" feel */
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03), 0 1px 3px rgba(0,0,0,0.02);
+            /* Remove transform transition so parallax is instant, keep others for hover */
+            transition: box-shadow 0.25s var(--ease-out-expo), border-color 0.25s ease-out, background 0.25s ease-out;
+            will-change: transform, box-shadow;
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-6px);
+            /* Deeper, softer shadow on hover */
+            box-shadow: 0 24px 50px rgba(15, 23, 42, 0.08), 0 10px 20px rgba(6, 182, 212, 0.05);
+            border-color: var(--color-accent-glow);
+            background: radial-gradient(circle at top left, #ECFEFF, #FFFFFF 55%);
+        }
+
+        .benefit-icon {
+            width: 48px;
+            height: 48px;
+            background: #ECFEFF;
+            color: var(--color-accent);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            transition: transform 0.25s var(--ease-out-expo), box-shadow 0.25s var(--ease-out-expo), background 0.25s ease-out;
+        }
+
+        .benefit-card:hover .benefit-icon {
+            transform: translateY(-2px) scale(1.05);
+            background: #CFFAFE;
+            box-shadow: 0 10px 25px rgba(6, 182, 212, 0.35);
+        }
+
+        /* HOW IT WORKS - Dark with subtle water reflections */
+        .how-it-works {
+            padding: 100px 0;
+            position: relative;
+            overflow: hidden;
+            color: white;
+            /* Deep inner shadow to feel like a pool */
+            box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.3);
+            /* Dark splash effect */
+            background:
+                /* Subtle teal reflections like light on dark water */
+                radial-gradient(ellipse 70% 40% at 20% 20%, rgba(6, 182, 212, 0.08), transparent 60%),
+                radial-gradient(ellipse 50% 60% at 80% 80%, rgba(8, 145, 178, 0.06), transparent 55%),
+                radial-gradient(ellipse 60% 30% at 60% 10%, rgba(6, 182, 212, 0.04), transparent 50%),
+                /* Dark gradient base */
+                linear-gradient(175deg, #1E293B 0%, #172033 50%, #0F172A 100%);
+        }
+
+        .how-it-works::before {
+            content: '';
+            position: absolute;
+            top: 20%;
+            right: -10%;
+            width: 50%;
+            height: 60%;
+            background: radial-gradient(ellipse at center, rgba(6, 182, 212, 0.03), transparent 60%);
+            border-radius: 40% 60% 50% 50% / 60% 40% 60% 40%;
+            filter: blur(40px);
+            pointer-events: none;
+        }
+
+        .steps-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 40px;
+            margin-top: 60px;
+            position: relative;
+        }
+
+        .step-line {
+            position: absolute;
+            top: 24px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: rgba(255,255,255,0.1);
+            z-index: 0;
+        }
+
+        .step-progress {
+            position: absolute;
+            top: 24px;
+            left: 0;
+            width: 0%;
+            height: 2px;
+            background: var(--color-accent);
+            z-index: 0;
+            transition: width 1s ease-out;
+        }
+
+        .step-item {
+            position: relative;
+            z-index: 1;
+            /* Enable smooth parallax */
+            will-change: transform;
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: transparent; /* Transparent so we can layer pseudos behind */
+            border: 2px solid var(--color-accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-bottom: 24px;
+            --glow-opacity: 0;
+            transition: transform 0.1s ease-out;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            cursor: default;
+            isolation: isolate; /* Creates a new stacking context */
+        }
+
+        /* 1. The dark background base (bottom layer) */
+        .step-number::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: #0F172A;
+            z-index: -2;
+        }
+
+        /* 2. The glow overlay (middle layer) */
+        .step-number::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle, var(--color-accent) 0%, transparent 70%);
+            opacity: var(--glow-opacity);
+            z-index: -1;
+            transition: opacity 0.1s linear;
+            mix-blend-mode: screen; /* Makes the glow look more vibrant */
+        }
+
+        /* PRODUCT DETAIL - Clean with subtle splash accents */
+        .product-detail {
+            padding: 100px 0;
+            position: relative;
+            overflow: hidden;
+            /* Very subtle organic background */
+            background:
+                radial-gradient(ellipse 80% 50% at 10% 60%, rgba(6, 182, 212, 0.05), transparent 60%),
+                radial-gradient(ellipse 60% 70% at 95% 30%, rgba(8, 145, 178, 0.04), transparent 55%),
+                radial-gradient(ellipse 100% 40% at 50% 100%, rgba(240, 244, 248, 0.8), transparent 60%),
+                linear-gradient(180deg, #F0F4F8 0%, #F5F8FA 50%, #F0F4F8 100%);
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 60px;
+        }
+
+        .product-gallery {
+            width: 100%;
+        }
+
+        .gallery-main {
+            border-radius: 24px;
+            overflow: hidden;
+            background: #eee;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        /* SPLASH CONTAINER - holds ALL splash elements */
+        .splash-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 10;
+            overflow: visible; /* Let splash go outside */
+            border-radius: inherit;
+        }
+
+        /* MAIN WATER DROPLET - larger, more visible, water-like */
+        .water-droplet {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            /* Rich water blue/teal gradient - MORE VISIBLE */
+            background: radial-gradient(ellipse at 30% 20%,
+                rgba(255, 255, 255, 0.95) 0%,
+                rgba(100, 200, 230, 0.9) 20%,
+                rgba(8, 145, 178, 0.85) 50%,
+                rgba(6, 100, 140, 0.7) 100%
+            );
+            box-shadow:
+                0 2px 4px rgba(0, 0, 0, 0.2),
+                0 0 8px rgba(8, 145, 178, 0.6),
+                0 0 15px rgba(6, 182, 212, 0.4),
+                inset 0 -2px 4px rgba(0, 50, 100, 0.3);
+            opacity: 0;
+        }
+
+        /* SMALL MIST PARTICLE - secondary spray */
+        .mist-particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            background: radial-gradient(circle,
+                rgba(180, 220, 240, 0.8) 0%,
+                rgba(8, 145, 178, 0.5) 70%,
+                transparent 100%
+            );
+            box-shadow: 0 0 6px rgba(8, 145, 178, 0.4);
+            opacity: 0;
+        }
+
+        /* SPLASH RING - expanding ring effect at impact */
+        .splash-ring {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            border: 2px solid rgba(8, 145, 178, 0.6);
+            background: transparent;
+            opacity: 0;
+        }
+
+        .gallery-main img {
+            display: block;
+            width: 100%;
+            height: auto;
+            transition: opacity 0.12s ease-out, transform 0.12s ease-out;
+        }
+
+        .gallery-main img.is-fading-out {
+            opacity: 0;
+            transform: scale(0.99);
+        }
+
+        .gallery-main img.is-fading-in {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .gallery-thumbs {
+            display: flex;
+            gap: 16px;
+        }
+
+        .thumb {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            overflow: hidden;
+            opacity: 0.6;
+            border: 2px solid transparent;
+            transition: opacity 0.2s ease-out, transform 0.2s ease-out, box-shadow 0.2s ease-out, border-color 0.2s ease-out;
+        }
+
+        .thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .thumb:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .thumb.active {
+            opacity: 1;
+            border: 2px solid var(--color-dark);
+            transform: translateY(-2px);
+        }
+
+        .product-info h2 {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        .price {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: var(--color-text-muted);
+            margin-bottom: 32px;
+        }
+
+        .price span {
+            color: var(--color-dark);
+            font-weight: 700;
+            font-size: 2rem;
+            margin-right: 8px;
+            display: inline-block;
+            animation: priceAttention 3s ease-in-out infinite;
+            /* Soft glow pulse for subtle attention */
+            text-shadow: 0 0 0 transparent;
+            position: relative;
+        }
+
+        .price span::after {
+            content: '';
+            position: absolute;
+            inset: -4px -8px;
+            border-radius: 8px;
+            background: radial-gradient(ellipse at center, rgba(8, 145, 178, 0.08), transparent 70%);
+            opacity: 0;
+            animation: priceGlowPulse 3s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes priceAttention {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        @keyframes priceGlowPulse {
+            0%, 100% { opacity: 0; transform: scale(0.95); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        .variant-selector {
+            margin-bottom: 32px;
+        }
+
+        .variant-label {
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .color-options {
+            display: flex;
+            gap: 12px;
+        }
+
+        .color-opt {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, border-color 0.2s ease-out;
+        }
+
+        .color-opt:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .color-opt.selected {
+            border-color: var(--color-dark);
+            transform: scale(1.1);
+        }
+
+        .add-to-cart-block {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .qty-input {
+            width: 80px;
+            padding: 0 16px;
+            border: 1px solid #ddd;
+            border-radius: 100px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .trust-badges {
+            display: flex;
+            gap: 24px;
+            padding-top: 24px;
+            border-top: 1px solid #eee;
+        }
+
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+            transition: transform 0.25s var(--ease-out-expo), color 0.25s ease-out;
+            cursor: default;
+            /* Gentle breathing animation */
+            animation: trustBreathe 4s ease-in-out infinite;
+        }
+
+        /* Stagger the breathing animation for each trust item */
+        .trust-item:nth-child(1) { animation-delay: 0s; }
+        .trust-item:nth-child(2) { animation-delay: 0.5s; }
+        .trust-item:nth-child(3) { animation-delay: 1s; }
+
+        @keyframes trustBreathe {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.015); opacity: 0.95; }
+        }
+
+        .trust-item:hover {
+            transform: translateY(-2px) scale(1.02);
+            color: var(--color-text-main);
+            animation-play-state: paused; /* Pause breathing on hover */
+        }
+
+        .trust-item span {
+            transition: transform 0.25s var(--ease-out-expo);
+        }
+
+        .trust-item:hover span {
+            transform: scale(1.15);
+        }
+
+        /* Product bullets inside buy box */
+        .product-bullets {
+            margin: 0 0 32px;
+            padding-left: 0;
+            list-style: none;
+            color: var(--color-text-muted);
+            font-size: 0.95rem;
+        }
+
+        .product-bullets li {
+            margin-bottom: 10px;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .product-bullets li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--color-accent);
+            font-weight: 700;
+            animation: checkPop 0.4s var(--ease-out-expo) backwards;
+        }
+
+        .product-bullets li:nth-child(1)::before { animation-delay: 0.1s; }
+        .product-bullets li:nth-child(2)::before { animation-delay: 0.2s; }
+        .product-bullets li:nth-child(3)::before { animation-delay: 0.3s; }
+        .product-bullets li:nth-child(4)::before { animation-delay: 0.4s; }
+
+        @keyframes checkPop {
+            0% { transform: scale(0) rotate(-45deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0); opacity: 1; }
+        }
+
+        /* REVIEWS / STORIES - Soft splash background */
+        .reviews {
+            padding: 100px 0;
+            position: relative;
+            overflow: hidden;
+            /* Organic white with subtle color washes */
+            background:
+                radial-gradient(ellipse 60% 50% at 15% 25%, rgba(6, 182, 212, 0.05), transparent 60%),
+                radial-gradient(ellipse 70% 45% at 85% 75%, rgba(8, 145, 178, 0.04), transparent 55%),
+                radial-gradient(ellipse 50% 30% at 50% 10%, rgba(207, 250, 254, 0.3), transparent 50%),
+                linear-gradient(170deg, #FFFFFF 0%, #FCFEFE 50%, #FAFCFC 100%);
+        }
+
+        .reviews::before {
+            content: '';
+            position: absolute;
+            top: -10%;
+            left: 60%;
+            width: 45%;
+            height: 35%;
+            background: radial-gradient(ellipse at center, rgba(6, 182, 212, 0.03), transparent 65%);
+            border-radius: 55% 45% 60% 40% / 45% 55% 45% 55%;
+            filter: blur(30px);
+            pointer-events: none;
+        }
+
+        .reviews-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .review-card {
+            background: #FFFFFF;
+            border-radius: 20px;
+            padding: 28px;
+            border: 1px solid #E5E7EB;
+            /* Enhanced shadow */
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04), 0 4px 6px rgba(0,0,0,0.01);
+            transition: transform 0.15s ease-out, box-shadow 0.25s var(--ease-out-expo), border-color 0.25s ease-out;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        /* Micro-stagger for review card reveal - subtle sequential entry */
+        .review-card.reveal-on-scroll:nth-child(1) { transition-delay: 0s; }
+        .review-card.reveal-on-scroll:nth-child(2) { transition-delay: 0.08s; }
+        .review-card.reveal-on-scroll:nth-child(3) { transition-delay: 0.16s; }
+
+        .review-card:hover {
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.07);
+            border-color: var(--color-accent-glow);
+            /* Transform is now controlled by JS for tilt effect */
+        }
+
+        .review-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #ECFEFF;
+            color: #0369A1;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .review-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #ECFEFF;
+            color: #0369A1;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .review-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #ECFEFF;
+            color: #0369A1;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .review-card h4 {
+            margin-bottom: 12px;
+        }
+
+        .review-card p {
+            color: var(--color-text-muted);
+            font-size: 0.95rem;
+        }
+
+        .review-meta {
+            margin-top: 12px;
+            font-weight: 500;
+            color: var(--color-text-main);
+            font-size: 0.9rem;
+        }
+
+        /* FAQ - Subtle organic background */
+        .faq {
+            padding: 100px 0;
+            position: relative;
+            overflow: hidden;
+            /* Layered splash effect */
+            background:
+                radial-gradient(ellipse 55% 60% at 5% 50%, rgba(6, 182, 212, 0.06), transparent 55%),
+                radial-gradient(ellipse 65% 45% at 95% 40%, rgba(8, 145, 178, 0.05), transparent 60%),
+                radial-gradient(ellipse 40% 30% at 40% 90%, rgba(6, 182, 212, 0.03), transparent 50%),
+                radial-gradient(ellipse 35% 40% at 70% 10%, rgba(8, 145, 178, 0.02), transparent 45%),
+                linear-gradient(175deg, #F9FAFB 0%, #F5F7F9 50%, #F0F3F6 100%);
+        }
+
+        .faq::after {
+            content: '';
+            position: absolute;
+            bottom: -5%;
+            right: 20%;
+            width: 40%;
+            height: 30%;
+            background: radial-gradient(ellipse at center, rgba(6, 182, 212, 0.04), transparent 60%);
+            border-radius: 45% 55% 40% 60% / 55% 45% 55% 45%;
+            filter: blur(25px);
+            pointer-events: none;
+        }
+
+        .faq-grid {
+            max-width: 800px;
+            margin: 0 auto;
+            display: grid;
+            gap: 20px;
+        }
+
+        .faq-item {
+            background: #FFFFFF;
+            border-radius: 16px;
+            padding: 20px 24px;
+            border: 1px solid #E5E7EB;
+            /* Subtle shadow for separation */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            /* Enable smooth parallax */
+            will-change: transform;
+        }
+
+        .faq-item h4 {
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .faq-item p {
+            font-size: 0.95rem;
+            color: var(--color-text-muted);
+        }
+
+        /* PARTICLE SYSTEM */
+        .particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* MERCURY BLOB CURSOR - Paler, more translucent */
+        .mercury-orb {
+            position: fixed;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            /* PALER - more white/translucent with subtle blue tint */
+            background: radial-gradient(circle at 35% 35%,
+                rgba(255, 255, 255, 0.85) 0%,
+                rgba(200, 230, 245, 0.6) 40%,
+                rgba(150, 200, 230, 0.4) 70%,
+                rgba(100, 180, 220, 0.2) 100%
+            );
+            box-shadow:
+                0 0 8px rgba(255, 255, 255, 0.5),
+                0 0 12px rgba(150, 200, 230, 0.4),
+                inset 0 0 4px rgba(255, 255, 255, 0.6);
+            /* Transform origin at center for proper scaling/stretching */
+            transform-origin: center center;
+            opacity: 0;
+            transition: opacity 0.4s ease-out;
+            /* Will be controlled by JS for blob deformation */
+        }
+
+        .mercury-orb.is-visible {
+            opacity: 1;
+        }
+
+        /* SATELLITE DROPLETS - tiny orbiting droplets */
+        .satellite-container {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9997;
+        }
+
+        .satellite-droplet {
+            position: fixed;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            pointer-events: none;
+            /* Even paler than main orb */
+            background: radial-gradient(circle at 40% 40%,
+                rgba(255, 255, 255, 0.9) 0%,
+                rgba(180, 220, 240, 0.5) 60%,
+                rgba(140, 190, 220, 0.2) 100%
+            );
+            box-shadow:
+                0 0 4px rgba(255, 255, 255, 0.4),
+                0 0 8px rgba(150, 200, 230, 0.3);
+            opacity: 0;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.2s ease-out;
+        }
+
+        .satellite-droplet.is-active {
+            opacity: 1;
+        }
+
+        /* Hide on mobile/touch devices */
+        @media (hover: none), (max-width: 768px) {
+            .mercury-orb,
+            .satellite-container,
+            .satellite-droplet {
+                display: none;
+            }
+        }
+
+        /* Hide when reduced motion is preferred */
+        @media (prefers-reduced-motion: reduce) {
+            .mercury-orb,
+            .satellite-container,
+            .satellite-droplet {
+                display: none;
+            }
+        }
+
+        /* REFINED ANIMATIONS - Subtle Images, Active Components */
+        
+        /* Very subtle wiggle for main images */
+        @keyframes wiggle {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(0.5px, -0.5px) rotate(0.05deg); }
+            50% { transform: translate(-0.25px, 0.5px) rotate(-0.05deg); }
+            75% { transform: translate(-0.5px, -0.25px) rotate(0.05deg); }
+        }
+
+        /* More active "jiggle" for secondary components */
+        @keyframes jiggleActive {
+            0%, 100% { transform: translateY(0) rotate(0); }
+            25% { transform: translateY(-3px) rotate(1deg); }
+            50% { transform: translateY(0) rotate(0); }
+            75% { transform: translateY(3px) rotate(-1deg); }
+        }
+
+        @keyframes floatY {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); } /* Increased float range */
+        }
+
+        .wiggle-img {
+            animation: wiggle 6s ease-in-out infinite; /* Slower, more subtle */
+            will-change: transform;
+        }
+
+        /* Apply active jiggle to icons/badges */
+        .jiggle-active {
+            animation: jiggleActive 4s ease-in-out infinite;
+            will-change: transform;
+        }
+
+        .float-y {
+            animation: floatY 4s ease-in-out infinite; /* Slightly faster float */
+            will-change: transform;
+        }
+
+        .float-x {
+            animation: floatX 6s ease-in-out infinite;
+            will-change: transform;
+        }
+
+        /* Parallax Wrappers */
+        .parallax-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        .parallax-img {
+            transition: transform 0.1s linear; /* Linear for smoother scroll sync */
+            will-change: transform;
+        }
+
+        .parallax-text {
+            transition: transform 0.1s linear;
+            will-change: transform;
+        }
+
+        /* Different animation delays for variety */
+        .wiggle-delay-1 { animation-delay: 0s; }
+        .wiggle-delay-2 { animation-delay: 0.5s; }
+        .wiggle-delay-3 { animation-delay: 1s; }
+        .wiggle-delay-4 { animation-delay: 1.5s; }
+
+        /* Respect users who prefer reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+
+            .floating-badge,
+            .wiggle-img,
+            .float-y,
+            .float-x,
+            .trust-item,
+            .price span,
+            .price span::after {
+                animation: none;
+            }
+
+            .parallax-img {
+                transform: none !important;
+            }
+
+            .particle-canvas {
+                display: none;
+            }
+
+            /* Disable hover shimmer and other micro-interactions */
+            .hero-text h1::before {
+                display: none;
+            }
+        }
+
+        /* ========================================
+           IMAGE HOVER 3D TILT + SPLASH EFFECT
+           ======================================== */
+        
+        /* Wrapper for 3D perspective on images */
+        .image-3d-tilt-wrapper {
+            perspective: 1000px;
+            transform-style: preserve-3d;
+            display: inline-block;
+            transition: transform 0.1s ease-out;
+        }
+        
+        /* Image inside wrapper gets the actual 3D rotation */
+        .image-3d-tilt-wrapper img {
+            transition: transform 0.15s ease-out, box-shadow 0.25s ease-out;
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+        
+        /* Subtle shadow enhancement on tilt */
+        .image-3d-tilt-wrapper.is-tilting img {
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* ========================================
+           SOFTER IMAGE CORNERS + WATER WOBBLE ANIMATION
+           ======================================== */
+        
+        /* Subtle water wobble animation - very gentle organic sway */
+        @keyframes waterWobble {
+            0%, 100% {
+                transform: scale(1) rotate(0deg) skew(0deg, 0deg);
+            }
+            20% {
+                transform: scale(1.002) rotate(0.15deg) skew(0.1deg, -0.1deg);
+            }
+            40% {
+                transform: scale(0.998) rotate(-0.1deg) skew(-0.05deg, 0.1deg);
+            }
+            60% {
+                transform: scale(1.001) rotate(0.1deg) skew(0.08deg, -0.05deg);
+            }
+            80% {
+                transform: scale(0.999) rotate(-0.12deg) skew(-0.08deg, 0.08deg);
+            }
+        }
+        
+        /* Apply MINIMAL corners to ALL main images - nearly square */
+        .hero-image-wrapper,
+        .gallery-main,
+        .comp-img {
+            border-radius: 6px !important; /* Very subtle - nearly square */
+            overflow: hidden;
+        }
+        
+        /* Main gallery slightly softer */
+        .gallery-main {
+            border-radius: 8px !important; /* Very subtle */
+        }
+        
+        /* Images inside get matching radius and subtle wobble on hover */
+        .hero-image-wrapper img,
+        .gallery-main img,
+        .comp-img img {
+            border-radius: inherit;
+        }
+        
+        /* Apply gentle wobble when hovering over image containers */
+        .hero-image-wrapper:hover img,
+        .gallery-main:hover img,
+        .comp-img:hover img {
+            animation: waterWobble 3s ease-in-out infinite;
+        }
+        
+        /* Thumbnails - minimal corners */
+        .thumb {
+            border-radius: 4px !important; /* Nearly square */
+        }
+        
+        /* Review cards - minimal */
+        .review-card {
+            border-radius: 8px; /* Reduced further */
+        }
+        
+        /* Benefit cards - minimal */
+        .benefit-card {
+            border-radius: 8px; /* Reduced further */
+        }
+        
+        /* Comparison cards - minimal */
+        .comp-card {
+            border-radius: 8px; /* Reduced further */
+        }
+        
+        /* FAQ items - minimal */
+        .faq-item {
+            border-radius: 6px; /* Reduced further */
+        }
+        
+        /* ========================================
+           DECORATIVE CUT-OFF CIRCLE PATTERNS
+           More contrasting partial circles as background decoration
+           ======================================== */
+        
+        /* Base styles for decorative circles */
+        .decorative-circle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* Light teal/cyan circles for dark backgrounds - MORE VISIBLE */
+        .decorative-circle.light {
+            border: 2px solid rgba(6, 182, 212, 0.45);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.15);
+        }
+        
+        /* Stronger light variant */
+        .decorative-circle.light-strong {
+            border: 3px solid rgba(6, 182, 212, 0.6);
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.2);
+        }
+        
+        /* Dark blue/teal circles for light backgrounds - MORE VISIBLE */
+        .decorative-circle.dark {
+            border: 2px solid rgba(8, 145, 178, 0.18);
+        }
+        
+        /* Stronger dark variant */
+        .decorative-circle.dark-strong {
+            border: 3px solid rgba(8, 145, 178, 0.25);
+        }
+        
+        /* Accent teal for white/very light sections */
+        .decorative-circle.teal {
+            border: 2px solid rgba(6, 182, 212, 0.22);
+        }
+        
+        .decorative-circle.teal-strong {
+            border: 3px solid rgba(6, 182, 212, 0.32);
+        }
+        
+        /* Wave separator styling - taller waves with fade effect for seamless transitions */
+        .wave-separator {
+            position: relative;
+            width: 100%;
+            overflow: visible;
+            line-height: 0;
+            /* Overlap with adjacent sections to eliminate straight lines */
+            margin-top: -30px;
+            margin-bottom: -30px;
+            z-index: 5;
+        }
+        
+        .wave-separator svg {
+            width: 100%;
+            height: 100px; /* Taller waves */
+            display: block;
+            /* Subtle drop shadow for depth */
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.03));
+        }
+        
+        .wave-separator.flip {
+            transform: rotate(180deg);
+        }
+        
+        /* Add fade effect using mask-image for smooth blending */
+        .wave-separator.fade-top svg {
+            mask-image: linear-gradient(to bottom, transparent 0%, black 30%, black 100%);
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 30%, black 100%);
+        }
+        
+        .wave-separator.fade-bottom svg {
+            mask-image: linear-gradient(to bottom, black 0%, black 70%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 0%, black 70%, transparent 100%);
+        }
+        
+        .wave-separator.fade-both svg {
+            mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
+        }
+        
+        @media (max-width: 768px) {
+            .wave-separator svg {
+                height: 60px;
+            }
+            .wave-separator {
+                margin-top: -20px;
+                margin-bottom: -20px;
+            }
+        }
+        
+        /* SPLASH PUDDLE SEPARATOR - Organic water splash transition */
+        /* Used for How It Works → Reviews transition (dark blue to white) */
+        .splash-puddle-separator {
+            position: relative;
+            width: 100%;
+            height: 140px; /* Taller for more organic splash effect */
+            overflow: visible;
+            line-height: 0;
+            /* Overlap with adjacent sections to eliminate gaps */
+            margin-top: -50px;
+            margin-bottom: -50px;
+            z-index: 5;
+        }
+        
+        .splash-puddle-separator svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        
+        /* Specific styles for How It Works → Reviews */
+        .splash-puddle-separator.how-to-reviews {
+            /* This separator sits between dark (#1E293B) and white (#FFFFFF) */
+            /* The SVG handles the visual transition with organic splash layers */
+        }
+        
+        @media (max-width: 768px) {
+            .splash-puddle-separator {
+                height: 100px;
+                margin-top: -35px;
+                margin-bottom: -35px;
+            }
+        }
+        
+        /* Container for hover splash particles */
+        .image-splash-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 20;
+            overflow: visible;
+            border-radius: inherit;
+        }
+        
+        /* Hover splash droplet - larger than cursor trail */
+        .image-hover-droplet {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            /* DARKER water gradient - deeper teal/blue tones */
+            background: radial-gradient(ellipse at 30% 20%,
+                rgba(200, 235, 245, 0.85) 0%,
+                rgba(6, 120, 160, 0.8) 25%,
+                rgba(4, 100, 140, 0.75) 55%,
+                rgba(2, 70, 110, 0.65) 100%
+            );
+            box-shadow:
+                0 2px 6px rgba(0, 0, 0, 0.2),
+                0 0 10px rgba(4, 100, 140, 0.5),
+                0 0 16px rgba(2, 70, 110, 0.35),
+                inset 0 -2px 5px rgba(0, 40, 80, 0.3);
+            opacity: 0;
+            transform-origin: center center;
+        }
+        
+        /* Ripple ring effect on image */
+        .image-hover-ripple {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            border: 2px solid rgba(8, 145, 178, 0.5);
+            background: transparent;
+            opacity: 0;
+            transform: translate(-50%, -50%);
+        }
+        
+        /* Hide effects on touch devices and reduced motion */
+        @media (hover: none), (max-width: 768px) {
+            .image-3d-tilt-wrapper img {
+                transform: none !important;
+            }
+            .image-splash-container {
+                display: none;
+            }
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+            .image-3d-tilt-wrapper img {
+                transform: none !important;
+                transition: none !important;
+            }
+            .image-splash-container {
+                display: none;
+            }
+        }
+
+        /* MOBILE RESPONSIVE */
+        @media (max-width: 768px) {
+            .hero-content { grid-template-columns: 1fr; text-align: center; }
+            .hero-text h1 { font-size: 3rem; }
+            .hero-actions { justify-content: center; }
+            .comparison-grid { grid-template-columns: 1fr; }
+            .steps-container { grid-template-columns: 1fr; }
+            .step-line { display: none; }
+            .product-grid { grid-template-columns: 1fr; }
+            .nav-links { display: none; } /* Simplified for demo */
+
+            /* Larger, easier-to-tap gallery thumbs on mobile */
+            .gallery-thumbs {
+                gap: 12px;
+            }
+            .thumb {
+                width: 72px;
+                height: 72px;
+            }
+        }
+
+        /* Mobile bottom sticky CTA bar */
+        .mobile-cta-bar {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 90;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: rgba(15, 23, 42, 0.98);
+            color: #F9FAFB;
+            box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.45);
+        }
+        .mobile-cta-bar__info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            font-size: 0.85rem;
+        }
+        .mobile-cta-bar__title {
+            font-weight: 600;
+        }
+        .mobile-cta-bar__price {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        .mobile-cta-bar__btn {
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-cta-bar {
+                display: flex;
+            }
+            body {
+                padding-bottom: 64px; /* avoid content hidden behind bar */
+            }
+        }
+
+        /* Force hero image to slightly overscan container to eliminate any edge gaps */
+        .hero-image-wrapper img {
+            width: 102%;
+            max-width: none;
+            height: auto;
+            display: block;
+            margin-left: -1%;
+        }
+
+        /* Footer Links */
+        .footer-link {
+            color: var(--color-text-muted);
+            transition: color 0.2s ease-out;
+            text-decoration: none;
+        }
+        .footer-link:hover {
+            color: var(--color-dark);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <!-- Particle Canvas for mouse trail effect -->
+    <canvas id="particleCanvas" class="particle-canvas"></canvas>
+    
+    <!-- Mercury Orb Cursor Follower -->
+    <div id="mercuryOrb" class="mercury-orb"></div>
+    
+    <!-- Satellite Droplets - orbit around the main mercury blob -->
+    <div class="satellite-droplet" id="satellite1"></div>
+    <div class="satellite-droplet" id="satellite2"></div>
+    <div class="satellite-droplet" id="satellite3"></div>
+
+    <header id="header">
+        <div class="container nav-container">
+            <div class="logo">SmartSplash™</div>
+            <nav class="nav-links">
+                <a href="#how-it-works">How It Works</a>
+                <a href="#reviews">Reviews</a>
+                <a href="#faq">FAQ</a>
+            </nav>
+            <a href="#product" class="btn btn-primary" style="padding: 10px 24px; font-size: 0.9rem;">Buy Now</a>
+        </div>
+    </header>
+
+    <section class="hero">
+        <!-- ORGANIC WATER SPLASH PUDDLE at bottom - irregular edge with varying intensity -->
+        <div class="hero-splash-puddle">
+            <svg viewBox="0 0 1440 180" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <!-- Gradient for intensity variation - more teal in some spots, more white in others -->
+                    <linearGradient id="splashGradient1" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:rgba(6,182,212,0.15);stop-opacity:1" />
+                        <stop offset="25%" style="stop-color:rgba(255,255,255,0.9);stop-opacity:1" />
+                        <stop offset="40%" style="stop-color:rgba(8,145,178,0.12);stop-opacity:1" />
+                        <stop offset="60%" style="stop-color:rgba(255,255,255,0.95);stop-opacity:1" />
+                        <stop offset="80%" style="stop-color:rgba(6,182,212,0.10);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:rgba(255,255,255,0.85);stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="splashGradient2" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:rgba(255,255,255,0.7);stop-opacity:1" />
+                        <stop offset="20%" style="stop-color:rgba(6,182,212,0.08);stop-opacity:1" />
+                        <stop offset="45%" style="stop-color:rgba(255,255,255,0.85);stop-opacity:1" />
+                        <stop offset="70%" style="stop-color:rgba(8,145,178,0.06);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:rgba(255,255,255,0.9);stop-opacity:1" />
+                    </linearGradient>
+                    <!-- Solid white for the bottom fill -->
+                    <linearGradient id="splashWhite" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#FFFFFF;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                
+                <!-- Layer 1: Deepest - subtle teal pools (most irregular) -->
+                <path d="M0,120
+                    C50,105 80,130 120,115
+                    C160,100 200,125 260,108
+                    C320,90 380,120 440,100
+                    C500,80 540,110 600,95
+                    C660,80 720,105 780,88
+                    C840,70 900,100 960,85
+                    C1020,70 1080,95 1140,80
+                    C1200,65 1260,90 1320,75
+                    C1380,60 1420,85 1440,70
+                    L1440,180 L0,180 Z"
+                    fill="url(#splashGradient1)" opacity="0.6"/>
+                
+                <!-- Layer 2: Middle - slightly higher, different rhythm -->
+                <path d="M0,135
+                    C70,120 100,145 170,128
+                    C240,110 290,140 370,118
+                    C450,95 510,130 590,105
+                    C670,80 730,115 810,95
+                    C890,75 950,108 1030,88
+                    C1110,68 1170,100 1250,82
+                    C1330,64 1390,95 1440,78
+                    L1440,180 L0,180 Z"
+                    fill="url(#splashGradient2)" opacity="0.7"/>
+                
+                <!-- Layer 3: Top edge - the main visible splash line (most prominent) -->
+                <path d="M0,150
+                    C40,142 70,158 130,145
+                    C190,132 230,155 300,140
+                    C370,125 420,150 500,135
+                    C580,120 640,145 720,130
+                    C800,115 860,142 940,125
+                    C1020,108 1080,138 1160,120
+                    C1240,102 1300,132 1380,115
+                    C1420,105 1440,125 1440,115
+                    L1440,180 L0,180 Z"
+                    fill="#FFFFFF" opacity="1"/>
+                
+                <!-- Extra organic blob shapes for "puddle" feel - scattered water pools -->
+                <ellipse cx="150" cy="155" rx="60" ry="15" fill="rgba(6,182,212,0.08)"/>
+                <ellipse cx="450" cy="160" rx="80" ry="12" fill="rgba(8,145,178,0.06)"/>
+                <ellipse cx="800" cy="158" rx="50" ry="10" fill="rgba(6,182,212,0.07)"/>
+                <ellipse cx="1100" cy="162" rx="70" ry="14" fill="rgba(8,145,178,0.05)"/>
+                <ellipse cx="1350" cy="156" rx="45" ry="11" fill="rgba(6,182,212,0.06)"/>
+                
+                <!-- Small scattered droplets for realism -->
+                <circle cx="100" cy="140" r="4" fill="rgba(6,182,212,0.1)"/>
+                <circle cx="280" cy="132" r="3" fill="rgba(8,145,178,0.08)"/>
+                <circle cx="520" cy="128" r="5" fill="rgba(6,182,212,0.09)"/>
+                <circle cx="680" cy="135" r="3" fill="rgba(8,145,178,0.07)"/>
+                <circle cx="920" cy="118" r="4" fill="rgba(6,182,212,0.08)"/>
+                <circle cx="1200" cy="125" r="5" fill="rgba(8,145,178,0.06)"/>
+                <circle cx="1380" cy="108" r="3" fill="rgba(6,182,212,0.07)"/>
+            </svg>
+        </div>
+        
+        <div class="container hero-content">
+            <div class="hero-text reveal-on-scroll">
+                <!-- Staggered parallax for text elements -->
+                <h1 class="parallax-text" data-parallax-speed="-0.08">Stop the Splash.<br>Save Your Shirt.</h1>
+                <p class="parallax-text" data-parallax-speed="-0.04">Tired of walking away from the sink looking like you took a shower? The SmartSplash™ Silicone Sink Splash Guard suctions to the front edge of your sink to block rogue spray, keeping your shirt dry and your floor safely drip-free.</p>
+                
+                <div class="parallax-text" data-parallax-speed="-0.02" style="margin-bottom: 24px; display: flex; align-items: center; gap: 12px; font-size: 0.95rem; color: var(--color-text-muted);">
+                    <span style="color: var(--color-accent); font-weight: 600;">✓ Fits Standard Sinks</span>
+                    <span style="width: 4px; height: 4px; background: #cbd5e1; border-radius: 50%;"></span>
+                    <span>Granite, Quartz & Stainless Steel</span>
+                </div>
+
+                <div class="hero-actions">
+                    <a href="#product" class="btn btn-primary">Get SmartSplash™</a>
+                    <a href="#how-it-works" class="btn btn-secondary">How It Works</a>
+                </div>
+                
+                <div style="margin-top: 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 16px; font-size: 0.85rem; color: var(--color-text-muted);">
+                    <span style="display: flex; align-items: center; gap: 6px;">🔒 Secure Checkout</span>
+                    <span style="display: flex; align-items: center; gap: 6px;">🚚 Free UK Shipping</span>
+                    <span style="display: flex; align-items: center; gap: 6px;">🛡️ 30-Day Risk-Free</span>
+                </div>
+                
+                <div style="margin-top: 20px; font-size: 0.9rem; color: var(--color-text-muted); display: flex; align-items: center; gap: 16px;">
+                    <span style="font-weight: 700; color: var(--color-dark); font-size: 1.1rem;">$24.99</span>
+                    <span style="text-decoration: line-through; opacity: 0.6;">$35.00</span>
+                    <span style="color: var(--color-accent); font-weight: 500;">Free Shipping & 30-Day Guarantee</span>
+                </div>
+            </div>
+            <div class="hero-image-wrapper reveal-on-scroll" style="transition-delay: 0.2s;">
+                <img src="smart-splash-hero.webp" alt="SmartSplash Silicone Sink Splash Guard on a modern kitchen sink" loading="eager">
+                <!-- Removed duplicate floating badge -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Wave Separator: Hero → Problem/Solution (white) - with fade effect -->
+    <div class="wave-separator flip fade-both">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none" style="fill: #FFFFFF;">
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V120H0Z" opacity=".25"></path>
+            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V120H0Z" opacity=".5"></path>
+            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V120H0Z"></path>
+        </svg>
+    </div>
+
+    <section class="problem-solution" style="position: relative;">
+        <!-- Decorative cut-off circles - MORE CONTRASTING & MORE OF THEM -->
+        <div class="decorative-circle teal-strong" style="width: 280px; height: 280px; top: -5%; left: -100px; clip-path: inset(0 0 0 35%);"></div>
+        <div class="decorative-circle teal" style="width: 180px; height: 180px; top: 15%; left: -60px; clip-path: inset(0 0 0 33%);"></div>
+        <div class="decorative-circle teal-strong" style="width: 220px; height: 220px; top: 40%; right: -80px; clip-path: inset(0 36% 0 0);"></div>
+        <div class="decorative-circle teal" style="width: 120px; height: 120px; top: 70%; right: -40px; clip-path: inset(0 33% 0 0);"></div>
+        <div class="decorative-circle teal" style="width: 150px; height: 150px; bottom: 5%; left: 15%; clip-path: inset(55% 0 0 0);"></div>
+        <div class="decorative-circle teal-strong" style="width: 100px; height: 100px; bottom: 20%; left: 45%; clip-path: inset(0 0 50% 0);"></div>
+        <div class="decorative-circle teal" style="width: 200px; height: 200px; top: 5%; right: 20%; clip-path: inset(0 0 0 60%);"></div>
+        <div class="container">
+            <div class="comparison-grid">
+                <div class="comp-card problem reveal-on-scroll">
+                    <div class="comp-header">
+                        <span class="comp-tag">The Problem</span>
+                        <h3>Soaked Shirts & Slippery Floors</h3>
+                        <p>High-pressure faucets, shallow sinks, and heavy pans send water straight over the rim—onto your clothes, cabinet doors, and the floor.</p>
+                    </div>
+                    <div class="comp-img">
+                        <img src="smart-splash-problem.webp" alt="Wet shirt and messy sink area from splashing water" style="filter: grayscale(100%); opacity: 0.8;" loading="lazy">
+                    </div>
+                </div>
+                <div class="comp-card solution reveal-on-scroll" style="transition-delay: 0.2s;">
+                    <div class="comp-header">
+                        <span class="comp-tag">The Fix</span>
+                        <h3>SmartSplash™ Silicone Sink Splash Guard</h3>
+                        <p>A soft, high-wall silicone barrier with multi-point suction that catches splashes at the edge of your sink and guides water back into the basin—not onto you or the floor.</p>
+                    </div>
+                    <div class="comp-img">
+                        <img src="smart-splash-solution.webp" alt="Sink with SmartSplash silicone sink splash guard blocking water" loading="lazy">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Wave Separator: Problem/Solution → Benefits (light gray) - with fade effect -->
+    <div class="wave-separator fade-both">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none" style="fill: #F0F4F8;">
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V120H0Z" opacity=".25"></path>
+            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V120H0Z" opacity=".5"></path>
+            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V120H0Z"></path>
+        </svg>
+    </div>
+
+    <section class="benefits" style="position: relative;">
+        <!-- Decorative cut-off circles - MORE CONTRASTING & MORE OF THEM -->
+        <div class="decorative-circle dark-strong" style="width: 320px; height: 320px; top: -8%; right: -120px; clip-path: inset(0 37% 0 0);"></div>
+        <div class="decorative-circle dark" style="width: 200px; height: 200px; top: 8%; right: -80px; clip-path: inset(0 40% 0 0);"></div>
+        <div class="decorative-circle dark-strong" style="width: 240px; height: 240px; bottom: 10%; left: -90px; clip-path: inset(0 0 0 37%);"></div>
+        <div class="decorative-circle dark" style="width: 140px; height: 140px; bottom: 25%; left: -50px; clip-path: inset(0 0 0 35%);"></div>
+        <div class="decorative-circle dark" style="width: 160px; height: 160px; top: 35%; left: 10%; clip-path: inset(0 0 55% 0);"></div>
+        <div class="decorative-circle dark-strong" style="width: 120px; height: 120px; top: 60%; left: 25%; clip-path: inset(50% 0 0 0);"></div>
+        <div class="decorative-circle dark" style="width: 180px; height: 180px; top: 20%; left: 60%; clip-path: inset(0 55% 0 0);"></div>
+        <div class="decorative-circle dark-strong" style="width: 100px; height: 100px; bottom: 40%; right: 15%; clip-path: inset(0 0 0 50%);"></div>
+        <div class="container">
+            <div class="section-header reveal-on-scroll">
+                <h2>Why Your Sink Needs This Guard</h2>
+                <p>Designed for real-world kitchens with high-arc faucets, shallow basins, and busy families. If you’re tired of wet shirts, slippery floors, and constant mopping, this is for you.</p>
+            </div>
+            <div class="benefits-grid">
+                <div class="benefit-card reveal-on-scroll">
+                    <div class="benefit-icon jiggle-active">💧</div>
+                    <h4>Stops Wet Shirts & Floors</h4>
+                    <p>Creates a high-wall barrier that blocks splashes before they hit your clothes or drip onto the floor.</p>
+                </div>
+                <div class="benefit-card reveal-on-scroll" style="transition-delay: 0.1s;">
+                    <div class="benefit-icon jiggle-active" style="animation-delay: 0.5s;">🛡️</div>
+                    <h4>Soft, Flexible Silicone</h4>
+                    <p>Bends comfortably when you lean against it—no rigid plastic digging into your stomach while you scrub.</p>
+                </div>
+                <div class="benefit-card reveal-on-scroll" style="transition-delay: 0.2s;">
+                    <div class="benefit-icon jiggle-active" style="animation-delay: 1s;">🧲</div>
+                    <h4>Secure Suction Grip</h4>
+                    <p>Multiple suction cups lock onto smooth sink rims so the guard won’t slide around, even with heavy pots and pans.</p>
+                </div>
+                <div class="benefit-card reveal-on-scroll" style="transition-delay: 0.3s;">
+                    <div class="benefit-icon jiggle-active" style="animation-delay: 1.5s;">✨</div>
+                    <h4>Easy to Clean & Mold Resistant</h4>
+                    <p>Non-porous silicone rinses clean in seconds or goes straight on the top rack of your dishwasher—no odors, no buildup.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Wave Separator: Benefits → How It Works (dark) - Full-width layered wave with fade -->
+    <div class="wave-separator flip fade-both">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none" style="fill: #1E293B;">
+            <!-- Layer 1: Base wave covering full width -->
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V120H0Z" opacity=".25"></path>
+            <!-- Layer 2: Mid wave -->
+            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V120H0Z" opacity=".5"></path>
+            <!-- Layer 3: Top wave - full solid coverage -->
+            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V120H0Z"></path>
+        </svg>
+    </div>
+
+    <section id="how-it-works" class="how-it-works" style="position: relative;">
+        <!-- Decorative cut-off circles (light on dark bg) - MORE CONTRASTING & MORE OF THEM -->
+        <div class="decorative-circle light-strong" style="width: 350px; height: 350px; top: -10%; left: -140px; clip-path: inset(0 0 0 40%);"></div>
+        <div class="decorative-circle light" style="width: 220px; height: 220px; top: 12%; left: -90px; clip-path: inset(0 0 0 40%);"></div>
+        <div class="decorative-circle light-strong" style="width: 280px; height: 280px; bottom: 5%; right: -100px; clip-path: inset(0 35% 0 0);"></div>
+        <div class="decorative-circle light" style="width: 160px; height: 160px; bottom: 18%; right: -60px; clip-path: inset(0 37% 0 0);"></div>
+        <div class="decorative-circle light" style="width: 180px; height: 180px; top: 45%; right: 20%; clip-path: inset(50% 0 0 0);"></div>
+        <div class="decorative-circle light-strong" style="width: 120px; height: 120px; top: 30%; left: 30%; clip-path: inset(0 0 55% 0);"></div>
+        <div class="decorative-circle light" style="width: 140px; height: 140px; bottom: 35%; left: 20%; clip-path: inset(0 50% 0 0);"></div>
+        <div class="decorative-circle light-strong" style="width: 100px; height: 100px; top: 65%; left: 55%; clip-path: inset(45% 0 0 0);"></div>
+        <div class="decorative-circle light" style="width: 200px; height: 200px; top: 5%; right: 35%; clip-path: inset(0 0 0 60%);"></div>
+        <div class="container">
+            <div class="section-header reveal-on-scroll">
+                <h2 style="color: white;">How It Works</h2>
+                <p style="color:#9CA3AF;">A simple, tool-free way to keep water where it belongs: in the sink.</p>
+            </div>
+            <div class="steps-container">
+                <div class="step-line"></div>
+                <div class="step-progress" id="stepProgress"></div>
+                
+                <div class="step-item reveal-on-scroll">
+                    <div class="step-number">1</div>
+                    <div style="font-size: 2rem; margin-bottom: 12px;">🧲</div>
+                    <h3>Press & Stick</h3>
+                    <p style="color: #9CA3AF;">Align SmartSplash™ with the front rim of your sink and press down each suction cup until it seals on the smooth surface.</p>
+                </div>
+                <div class="step-item reveal-on-scroll" style="transition-delay: 0.2s;">
+                    <div class="step-number">2</div>
+                    <div style="font-size: 2rem; margin-bottom: 12px;">💦</div>
+                    <h3>Wash as Usual</h3>
+                    <p style="color: #9CA3AF;">The curved, high-wall silicone barrier catches and redirects splashes back into the basin while you rinse, scrub, and spray.</p>
+                </div>
+                <div class="step-item reveal-on-scroll" style="transition-delay: 0.4s;">
+                    <div class="step-number">3</div>
+                    <div style="font-size: 2rem; margin-bottom: 12px;">🔁</div>
+                    <h3>Peel, Rinse, Store</h3>
+                    <p style="color: #9CA3AF;">When you’re done, peel from one end to release the suction, rinse it off, or leave it in place ready for the next round of dishes.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Wave Separator: How It Works → Reviews (white) - Standard layered waves with fade effect -->
+    <div class="wave-separator fade-both">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none" style="fill: #FFFFFF;">
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V120H0Z" opacity=".25"></path>
+            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V120H0Z" opacity=".5"></path>
+            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V120H0Z"></path>
+        </svg>
+    </div>
+
+    <section id="reviews" class="reviews" style="position: relative;">
+        <!-- Decorative cut-off circles - MORE CONTRASTING & MORE OF THEM -->
+        <div class="decorative-circle teal-strong" style="width: 280px; height: 280px; top: -5%; right: -110px; clip-path: inset(0 39% 0 0);"></div>
+        <div class="decorative-circle teal" style="width: 170px; height: 170px; top: 10%; right: -70px; clip-path: inset(0 41% 0 0);"></div>
+        <div class="decorative-circle teal-strong" style="width: 220px; height: 220px; bottom: 15%; left: -80px; clip-path: inset(0 0 0 36%);"></div>
+        <div class="decorative-circle teal" style="width: 130px; height: 130px; bottom: 30%; left: -45px; clip-path: inset(0 0 0 34%);"></div>
+        <div class="decorative-circle teal" style="width: 160px; height: 160px; top: 40%; left: 10%; clip-path: inset(55% 0 0 0);"></div>
+        <div class="decorative-circle teal-strong" style="width: 120px; height: 120px; top: 25%; left: 40%; clip-path: inset(0 0 50% 0);"></div>
+        <div class="decorative-circle teal" style="width: 180px; height: 180px; bottom: 5%; right: 25%; clip-path: inset(0 0 0 55%);"></div>
+        <div class="decorative-circle teal-strong" style="width: 90px; height: 90px; top: 60%; right: 10%; clip-path: inset(50% 0 0 0);"></div>
+        <div class="container">
+            <div class="section-header reveal-on-scroll">
+                <h2>Real Kitchens, Real Dry Shirts</h2>
+                <p>SmartSplash™ slips into your existing routine—whether you’re rinsing a single glass or tackling a mountain of pots.</p>
+            </div>
+            <div class="reviews-grid">
+                <div class="review-card reveal-on-scroll">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                        <div style="color: #F59E0B;">★★★★★</div>
+                        <div class="review-badge">Verified Purchase</div>
+                    </div>
+                    <h4>“No more pre-dinner outfit changes.”</h4>
+                    <p>Sarah was hosting friends for dinner. Ten minutes before guests arrived, she rinsed a few wine glasses and used to end up with a huge wet patch on her dress. With the SmartSplash™ guard in place, the water stays in the sink and she greets guests looking polished, not damp.</p>
+                    <p class="review-meta">— Sarah, dinner-party host</p>
+                </div>
+                <div class="review-card reveal-on-scroll" style="transition-delay: 0.15s;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                        <div style="color: #F59E0B;">★★★★★</div>
+                        <div class="review-badge">Verified Purchase</div>
+                    </div>
+                    <h4>“Tamed my high-arc sprayer.”</h4>
+                    <p>Mark’s industrial-style faucet looked amazing but sprayed water everywhere. Even washing a single apple soaked the countertop. After adding the silicone splash guard to the front rim, the spray hits the soft wall and drops back into the basin instead of onto his clothes.</p>
+                    <p class="review-meta">— Mark, home cook</p>
+                </div>
+                <div class="review-card reveal-on-scroll" style="transition-delay: 0.3s;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                        <div style="color: #F59E0B;">★★★★★</div>
+                        <div class="review-badge">Verified Purchase</div>
+                    </div>
+                    <h4>“A calmer dishwashing routine.”</h4>
+                    <p>It’s a busy weeknight. You stick SmartSplash™ to the sink edge, scrub vigorously, and let the splashes hit the guard instead of your belly and the floor. When you’re done, you peel it off, rinse it, and you’re finished—no outfit change, no mopping, no drama.</p>
+                    <p class="review-meta">— Jessica, busy mom</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Wave Separator: Reviews → Product Detail (light gray) - with fade effect -->
+    <div class="wave-separator flip fade-both">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none" style="fill: #F0F4F8;">
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V120H0Z" opacity=".25"></path>
+            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V120H0Z" opacity=".5"></path>
+            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V120H0Z"></path>
+        </svg>
+    </div>
+
+    <section id="product" class="product-detail" style="position: relative;">
+        <!-- Decorative cut-off circles - MORE CONTRASTING & MORE OF THEM -->
+        <div class="decorative-circle dark-strong" style="width: 300px; height: 300px; top: -5%; left: -120px; clip-path: inset(0 0 0 40%);"></div>
+        <div class="decorative-circle dark" style="width: 190px; height: 190px; top: 15%; left: -75px; clip-path: inset(0 0 0 39%);"></div>
+        <div class="decorative-circle dark-strong" style="width: 250px; height: 250px; bottom: 15%; right: -95px; clip-path: inset(0 38% 0 0);"></div>
+        <div class="decorative-circle dark" style="width: 140px; height: 140px; bottom: 35%; right: -50px; clip-path: inset(0 35% 0 0);"></div>
+        <div class="decorative-circle dark" style="width: 160px; height: 160px; top: 50%; right: 8%; clip-path: inset(55% 0 0 0);"></div>
+        <div class="decorative-circle dark-strong" style="width: 110px; height: 110px; top: 30%; left: 35%; clip-path: inset(0 0 50% 0);"></div>
+        <div class="decorative-circle dark" style="width: 180px; height: 180px; bottom: 50%; left: 20%; clip-path: inset(0 55% 0 0);"></div>
+        <div class="decorative-circle dark-strong" style="width: 80px; height: 80px; top: 70%; left: 60%; clip-path: inset(50% 0 0 0);"></div>
+        <div class="container">
+            <div class="product-grid">
+                <div class="product-gallery">
+                    <div class="gallery-main parallax-img" data-parallax-speed="0.02">
+                        <img id="mainImage" src="smart-splash-solution.webp" alt="SmartSplash Silicone Sink Splash Guard - main view" loading="lazy" class="wiggle-img wiggle-delay-4">
+                    </div>
+                    <div class="gallery-thumbs">
+                        <div class="thumb active float-x wiggle-delay-1" onclick="changeImage(this, 'smart-splash-detail-1.webp')" tabindex="0">
+                            <img src="smart-splash-detail-1.webp" alt="Close-up detail view" loading="lazy">
+                        </div>
+                        <div class="thumb float-x wiggle-delay-2" onclick="changeImage(this, 'smart-splash-hero.webp')" tabindex="0">
+                            <img src="smart-splash-hero.webp" alt="Hero view" loading="lazy">
+                        </div>
+                        <div class="thumb float-x wiggle-delay-3" onclick="changeImage(this, 'smart-splash-detail-2.avif')" tabindex="0">
+                            <img src="smart-splash-detail-2.avif" alt="Side view" loading="lazy">
+                        </div>
+                        <div class="thumb float-x wiggle-delay-4" onclick="changeImage(this, 'smart-splash-lifestyle.png')" tabindex="0">
+                            <img src="smart-splash-lifestyle.png" alt="Lifestyle view" loading="lazy">
+                        </div>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <div style="margin-bottom: 10px; color: var(--color-accent); font-weight: 600; letter-spacing: 0.05em;">BEST SELLER</div>
+                    <h2>SmartSplash™ Silicone Sink Splash Guard</h2>
+                    <div class="price"><span>$24.99</span> <del>$35.00</del></div>
+                    <p style="margin-bottom: 20px; color: var(--color-text-muted);">
+                        Tired of finishing the dishes with a soaked shirt and puddles on the floor? SmartSplash™ is a flexible, suction-backed silicone splash guard that attaches to the front edge of your sink to block water before it escapes the basin.
+                    </p>
+                    <ul class="product-bullets">
+                        <li><strong>Instantly stops splashes</strong> from high-arc faucets, sprayers, and shallow sinks.</li>
+                        <li><strong>Soft, comfort-first silicone</strong> bends when you lean against it—no sharp edges or bruised bellies.</li>
+                        <li><strong>Secure suction grip</strong> keeps it in place on smooth, non-porous rims like granite, quartz, and stainless steel.</li>
+                        <li><strong>Easy to clean & mold resistant</strong> thanks to non-porous, heat-resistant silicone that’s dishwasher safe.</li>
+                    </ul>
+
+                    <div class="add-to-cart-block">
+                        <div id='product-component-1764920785941'></div>
+                        <script type="text/javascript">
+                        /*<![CDATA[*/
+                        (function () {
+                          var scriptURL = 'https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js';
+                          if (window.ShopifyBuy) {
+                            if (window.ShopifyBuy.UI) {
+                              ShopifyBuyInit();
+                            } else {
+                              loadScript();
+                            }
+                          } else {
+                            loadScript();
+                          }
+                          function loadScript() {
+                            var script = document.createElement('script');
+                            script.async = true;
+                            script.src = scriptURL;
+                            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(script);
+                            script.onload = ShopifyBuyInit;
+                          }
+                          function ShopifyBuyInit() {
+                            var client = ShopifyBuy.buildClient({
+                              domain: 'wmddgt-rk.myshopify.com',
+                              storefrontAccessToken: '227cc1056e19fe59879e3029c64e558c',
+                            });
+                            ShopifyBuy.UI.onReady(client).then(function (ui) {
+                              ui.createComponent('product', {
+                                id: '10525775495495',
+                                node: document.getElementById('product-component-1764920785941'),
+                                moneyFormat: '%C2%A3%7B%7Bamount%7D%7D',
+                                options: {
+                          "product": {
+                            "styles": {
+                              "product": {
+                                "@media (min-width: 601px)": {
+                                  "max-width": "calc(25% - 20px)",
+                                  "margin-left": "20px",
+                                  "margin-bottom": "50px"
+                                }
+                              },
+                              "button": {
+                                "font-family": "Space Grotesk, sans-serif",
+                                "font-weight": "600",
+                                "font-size": "1rem",
+                                "padding": "16px 32px",
+                                "border-radius": "100px",
+                                "background": "linear-gradient(135deg, #0F172A, #020617)",
+                                "color": "#ffffff",
+                                ":hover": {
+                                  "background": "#0F172A",
+                                  "transform": "translateY(-2px)"
+                                }
+                              }
+                            },
+                            "contents": {
+                              "img": false,
+                              "title": false,
+                              "price": false
+                            },
+                            "text": {
+                              "button": "Add to cart"
+                            }
+                          },
+                          "productSet": {
+                            "styles": {
+                              "products": {
+                                "@media (min-width: 601px)": {
+                                  "margin-left": "-20px"
+                                }
+                              }
+                            }
+                          },
+                          "modalProduct": {
+                            "contents": {
+                              "img": false,
+                              "imgWithCarousel": true,
+                              "button": false,
+                              "buttonWithQuantity": true
+                            },
+                            "styles": {
+                              "product": {
+                                "@media (min-width: 601px)": {
+                                  "max-width": "100%",
+                                  "margin-left": "0px",
+                                  "margin-bottom": "0px"
+                                }
+                              }
+                            },
+                            "text": {
+                              "button": "Add to cart"
+                            }
+                          },
+                          "option": {},
+                          "cart": {
+                            "text": {
+                              "total": "Subtotal",
+                              "button": "Checkout"
+                            }
+                          },
+                          "toggle": {}
+                        },
+                              });
+                            });
+                          }
+                        })();
+                        /*]]>*/
+                        </script>
+                    </div>
+
+                    <div class="trust-badges">
+                        <div class="trust-item">
+                            <span>🚚</span> Free Shipping
+                        </div>
+                        <div class="trust-item">
+                            <span>🛡️</span> 30-Day Guarantee
+                        </div>
+                        <div class="trust-item">
+                            <span>🔒</span> Secure Checkout
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Wave Separator: Product Detail → FAQ (slightly darker gray) - with fade effect -->
+    <div class="wave-separator fade-both">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none" style="fill: #F9FAFB;">
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V120H0Z" opacity=".25"></path>
+            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V120H0Z" opacity=".5"></path>
+            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V120H0Z"></path>
+        </svg>
+    </div>
+
+    <section id="faq" class="faq" style="position: relative;">
+        <!-- Decorative cut-off circles - MORE CONTRASTING & MORE OF THEM -->
+        <div class="decorative-circle dark-strong" style="width: 260px; height: 260px; top: -8%; right: -100px; clip-path: inset(0 38% 0 0);"></div>
+        <div class="decorative-circle dark" style="width: 150px; height: 150px; top: 18%; right: -55px; clip-path: inset(0 36% 0 0);"></div>
+        <div class="decorative-circle dark-strong" style="width: 220px; height: 220px; bottom: 10%; left: -85px; clip-path: inset(0 0 0 38%);"></div>
+        <div class="decorative-circle dark" style="width: 120px; height: 120px; bottom: 25%; left: -40px; clip-path: inset(0 0 0 33%);"></div>
+        <div class="decorative-circle dark" style="width: 140px; height: 140px; top: 55%; left: 25%; clip-path: inset(0 55% 0 0);"></div>
+        <div class="decorative-circle dark-strong" style="width: 100px; height: 100px; top: 35%; left: 50%; clip-path: inset(55% 0 0 0);"></div>
+        <div class="decorative-circle dark" style="width: 170px; height: 170px; bottom: 40%; right: 15%; clip-path: inset(0 0 0 50%);"></div>
+        <div class="decorative-circle dark-strong" style="width: 90px; height: 90px; top: 75%; right: 30%; clip-path: inset(50% 0 0 0);"></div>
+        <div class="container">
+            <div class="section-header reveal-on-scroll">
+                <h2>Frequently Asked Questions</h2>
+                <p>Everything you need to know about getting the most out of your SmartSplash™ Silicone Sink Splash Guard.</p>
+            </div>
+            <div class="faq-grid">
+                <div class="faq-item reveal-on-scroll">
+                    <h4>Will this stick to my sink?</h4>
+                    <p>SmartSplash™ adheres best to smooth, non-porous surfaces like granite, marble, quartz, polished wood, and stainless steel. It may struggle to stick to rough, unsealed stone or heavily textured tiles because the suction cups need a flat surface to seal.</p>
+                </div>
+                <div class="faq-item reveal-on-scroll">
+                    <h4>How do I clean it?</h4>
+                    <p>It's incredibly easy to clean. Rinse it with warm soapy water after use or place it on the top rack of your dishwasher to sanitize. The silicone is heat-resistant and built to handle daily use.</p>
+                </div>
+                <div class="faq-item reveal-on-scroll">
+                    <h4>Does it get in the way of my arms?</h4>
+                    <p>No. We use soft, flexible silicone so that if your arms brush against it—or you lean on it—it bends comfortably instead of digging into your skin like hard plastic guards.</p>
+                </div>
+                <div class="faq-item reveal-on-scroll">
+                    <h4>Will it mold or start to smell?</h4>
+                    <p>Silicone is naturally non-porous and resistant to mold and mildew. It doesn't absorb water or odors. Just give it a quick wipe or rinse periodically to keep it fresh and spotless.</p>
+                </div>
+                <div class="faq-item reveal-on-scroll">
+                    <h4>What happens if I bump it?</h4>
+                    <p>The suction cups are designed to hold firm against normal bumps and arm pressure. If you hit it very hard, it will flex rather than crack, and you can simply press it back down if any suction releases.</p>
+                </div>
+                <div class="faq-item reveal-on-scroll">
+                    <h4>Can I move it between sinks?</h4>
+                    <p>Yes. Just peel up one edge to release the vacuum seal, then move it to another sink and press down again. It's perfect for switching between your kitchen, laundry, or utility sink.</p>
+                </div>
+                <div class="faq-item reveal-on-scroll">
+                    <h4>Is it safe for kids and families?</h4>
+                    <p>Absolutely. The soft silicone has no sharp edges, making it safe for families with children who are learning to help with dishes. It helps keep little helpers dry and reduces the risk of slippery puddles on the floor.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Wave Separator: FAQ → Footer - with fade effect -->
+    <div class="wave-separator flip fade-both">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none" style="fill: #E5E7EB;">
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V120H0Z" opacity=".25"></path>
+            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V120H0Z" opacity=".5"></path>
+            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V120H0Z"></path>
+        </svg>
+    </div>
+
+    <footer style="background: linear-gradient(to bottom, #F3F4F6, #E5E7EB); padding: 80px 0 40px; margin-top: 0; position: relative; overflow: hidden;">
+        <!-- Subtle footer decoration -->
+        <div class="decorative-circle dark" style="width: 300px; height: 300px; top: -150px; left: 50%; transform: translateX(-50%); opacity: 0.05;"></div>
+        
+        <div class="container" style="text-align: center; color: var(--color-text-muted); position: relative; z-index: 1;">
+            <div style="font-family: var(--font-heading); font-weight: 700; font-size: 1.5rem; color: var(--color-dark); margin-bottom: 16px;">SmartSplash™</div>
+            <div style="display: flex; justify-content: center; gap: 24px; margin-bottom: 32px; font-size: 0.9rem;">
+                <a href="#" class="footer-link">Privacy Policy</a>
+                <a href="#" class="footer-link">Terms of Service</a>
+                <a href="#" class="footer-link">Contact Support</a>
+            </div>
+            <p style="font-size: 0.85rem; opacity: 0.7;">&copy; 2024 SmartSplash™. Designed for dry shirts everywhere.</p>
+        </div>
+    </footer>
+
+    <!-- Mobile sticky CTA bar (shown via JS on scroll) -->
+    <div class="mobile-cta-bar" id="mobileCtaBar" aria-hidden="true">
+        <div class="mobile-cta-bar__info">
+            <span class="mobile-cta-bar__title">SmartSplash™ Guard</span>
+            <span class="mobile-cta-bar__price">From $24.99 • Free Shipping</span>
+        </div>
+        <a href="#product" class="btn btn-primary mobile-cta-bar__btn" style="padding: 10px 20px; font-size: 0.9rem;">
+            Buy now
+        </a>
+    </div>
+
+    <script>
+        // Detect reduced motion preference safely
+        const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // Cache commonly used elements
+        const revealElements = document.querySelectorAll('.reveal-on-scroll');
+        const stepProgress = document.getElementById('stepProgress');
+        const stepItems = document.querySelectorAll('.step-item');
+
+        // Scroll Reveal Animation with reduced-motion support & progress bar integration
+        if (!prefersReducedMotion && 'IntersectionObserver' in window) {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: "0px 0px -50px 0px"
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+
+                        // Progressive "How It Works" line animation
+                        if (entry.target.classList.contains('step-item') && stepProgress && stepItems.length) {
+                            const index = Array.from(stepItems).indexOf(entry.target);
+                            if (index !== -1) {
+                                const progressPercent = ((index + 1) / stepItems.length) * 100;
+                                stepProgress.style.width = progressPercent + '%';
+                            }
+                        }
+
+                        // Unobserve element once it's visible for performance
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            revealElements.forEach(el => {
+                observer.observe(el);
+            });
+        } else {
+            // If reduced motion is preferred or IntersectionObserver is not available:
+            // - Make all reveal elements visible immediately
+            // - Fill the "How It Works" progress bar
+            revealElements.forEach(el => el.classList.add('is-visible'));
+            if (stepProgress) {
+                stepProgress.style.width = '100%';
+            }
+        }
+
+        // Header Scroll Effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            if (!header) return;
+
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Smooth-scrolling for in-page anchor links (respects reduced motion)
+        if (!prefersReducedMotion) {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', (event) => {
+                    const targetId = anchor.getAttribute('href').slice(1);
+                    const target = document.getElementById(targetId);
+
+                    if (target) {
+                        event.preventDefault();
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+        }
+
+        // Image Gallery with smooth fade transition and SPLASH EFFECT
+        function changeImage(thumb, src) {
+            const mainImage = document.getElementById('mainImage');
+            const galleryMain = document.querySelector('.gallery-main');
+            if (!mainImage || !src) return;
+
+            // Avoid unnecessary work if image is already shown
+            if (mainImage.getAttribute('src') === src) return;
+
+            // Update active thumbnail state
+            document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+            thumb.classList.add('active');
+
+            if (prefersReducedMotion) {
+                // Instant swap if user prefers reduced motion
+                mainImage.src = src;
+                return;
+            }
+
+            // =============================================
+            // SUBTLE WATER SPLASH EFFECT - Clean, understated transition
+            // =============================================
+            if (galleryMain) {
+                // Create container if needed
+                let splashContainer = galleryMain.querySelector('.splash-container');
+                if (!splashContainer) {
+                    splashContainer = document.createElement('div');
+                    splashContainer.className = 'splash-container';
+                    galleryMain.appendChild(splashContainer);
+                }
+
+                const rect = galleryMain.getBoundingClientRect();
+                
+                // ========== SUBTLE DROPLETS - Small, few, quick fade ==========
+                const dropletCount = 12; // Much fewer droplets
+                
+                for (let i = 0; i < dropletCount; i++) {
+                    const droplet = document.createElement('div');
+                    droplet.className = 'water-droplet';
+                    
+                    // Random edge selection
+                    const edge = Math.floor(Math.random() * 4);
+                    const posOnEdge = Math.random();
+                    
+                    let startX, startY, baseVelX, baseVelY;
+                    
+                    if (edge === 0) { // Top edge
+                        startX = rect.width * posOnEdge;
+                        startY = 0;
+                        baseVelX = (Math.random() - 0.5) * 2;
+                        baseVelY = -(2 + Math.random() * 3);
+                    } else if (edge === 1) { // Right edge
+                        startX = rect.width;
+                        startY = rect.height * posOnEdge;
+                        baseVelX = 2 + Math.random() * 3;
+                        baseVelY = (Math.random() - 0.5) * 2;
+                    } else if (edge === 2) { // Bottom edge
+                        startX = rect.width * posOnEdge;
+                        startY = rect.height;
+                        baseVelX = (Math.random() - 0.5) * 2;
+                        baseVelY = 2 + Math.random() * 3;
+                    } else { // Left edge
+                        startX = 0;
+                        startY = rect.height * posOnEdge;
+                        baseVelX = -(2 + Math.random() * 3);
+                        baseVelY = (Math.random() - 0.5) * 2;
+                    }
+                    
+                    // Small sizes only (3-8px)
+                    const size = 3 + Math.random() * 5;
+                    
+                    droplet.style.width = size + 'px';
+                    droplet.style.height = size + 'px';
+                    droplet.style.left = startX + 'px';
+                    droplet.style.top = startY + 'px';
+                    droplet.style.opacity = '0.6';
+                    
+                    splashContainer.appendChild(droplet);
+                    
+                    // Subtle physics animation
+                    let x = startX, y = startY;
+                    let vx = baseVelX, vy = baseVelY;
+                    let life = 0;
+                    const maxLife = 30 + Math.random() * 20; // Short lifespan
+                    const friction = 0.94;
+                    const gravity = 0.15;
+                    
+                    function animateDroplet() {
+                        life++;
+                        
+                        vx *= friction;
+                        vy *= friction;
+                        vy += gravity;
+                        x += vx;
+                        y += vy;
+                        
+                        const progress = life / maxLife;
+                        const opacity = Math.max(0, 0.6 * (1 - Math.pow(progress, 0.4)));
+                        const scale = 1 - (progress * 0.3);
+                        
+                        droplet.style.left = x + 'px';
+                        droplet.style.top = y + 'px';
+                        droplet.style.opacity = opacity;
+                        droplet.style.transform = `scale(${scale})`;
+                        
+                        if (life < maxLife && opacity > 0.01) {
+                            requestAnimationFrame(animateDroplet);
+                        } else {
+                            droplet.remove();
+                        }
+                    }
+                    
+                    setTimeout(() => requestAnimationFrame(animateDroplet), Math.random() * 30);
+                }
+                
+                // ========== SINGLE SUBTLE RING at center ==========
+                const ring = document.createElement('div');
+                ring.className = 'splash-ring';
+                
+                ring.style.left = (rect.width / 2) + 'px';
+                ring.style.top = (rect.height / 2) + 'px';
+                ring.style.width = '20px';
+                ring.style.height = '20px';
+                ring.style.transform = 'translate(-50%, -50%)';
+                ring.style.opacity = '0.4';
+                
+                splashContainer.appendChild(ring);
+                
+                let ringSize = 20;
+                let ringOpacity = 0.4;
+                let ringLife = 0;
+                const ringMaxLife = 25;
+                
+                function animateRing() {
+                    ringLife++;
+                    ringSize += 6;
+                    ringOpacity = 0.4 * (1 - ringLife / ringMaxLife);
+                    
+                    ring.style.width = ringSize + 'px';
+                    ring.style.height = ringSize + 'px';
+                    ring.style.opacity = ringOpacity;
+                    
+                    if (ringLife < ringMaxLife) {
+                        requestAnimationFrame(animateRing);
+                    } else {
+                        ring.remove();
+                    }
+                }
+                
+                requestAnimationFrame(animateRing);
+            }
+
+            // Animate fade-out, swap src, then fade-in
+            mainImage.classList.remove('is-fading-in');
+            mainImage.classList.add('is-fading-out');
+
+            setTimeout(() => {
+                mainImage.src = src;
+                mainImage.classList.remove('is-fading-out');
+                mainImage.classList.add('is-fading-in');
+
+                // Clean up the class after the fade-in completes
+                setTimeout(() => {
+                    mainImage.classList.remove('is-fading-in');
+                }, 120);
+            }, 80); // Faster image swap
+        }
+
+        // ========================================
+        // PARTICLE SYSTEM - Mouse Trail Effect
+        // ========================================
+        (function() {
+            if (prefersReducedMotion) return;
+
+            const canvas = document.getElementById('particleCanvas');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            let mouseX = 0;
+            let mouseY = 0;
+            let isMouseMoving = false;
+            let mouseTimeout;
+
+            // Resize canvas to full window
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            // Particle class
+            class Particle {
+                constructor(x, y) {
+                    this.x = x;
+                    this.y = y;
+                    // SMALLER particles on average (0.5-2px) with more variation
+                    this.size = Math.random() * 1.5 + 0.5;
+                    this.speedX = (Math.random() - 0.5) * 1.5; // Slower speed
+                    this.speedY = (Math.random() - 0.5) * 1.5;
+                    this.life = 1;
+                    this.decay = Math.random() * 0.025 + 0.015; // Faster decay for smaller particles
+                    // VARIED COLORS - spread across teal, cyan, blue, and occasional purple
+                    // Random selection from color palette
+                    const colorChoice = Math.random();
+                    if (colorChoice < 0.4) {
+                        // Deep teal (most common)
+                        this.hue = 180 + Math.random() * 15;
+                    } else if (colorChoice < 0.65) {
+                        // Cyan/aqua
+                        this.hue = 195 + Math.random() * 10;
+                    } else if (colorChoice < 0.85) {
+                        // Blue
+                        this.hue = 210 + Math.random() * 20;
+                    } else {
+                        // Occasional purple accent
+                        this.hue = 260 + Math.random() * 30;
+                    }
+                    // Also vary saturation and lightness slightly
+                    this.saturation = 70 + Math.random() * 30; // 70-100%
+                    this.lightness = 40 + Math.random() * 20; // 40-60%
+                }
+
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    this.life -= this.decay;
+                    this.size *= 0.95;
+                }
+
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    // Use varied saturation and lightness for more natural look
+                    ctx.fillStyle = `hsla(${this.hue}, ${this.saturation}%, ${this.lightness}%, ${this.life * 0.6})`;
+                    ctx.fill();
+                    
+                    // Subtle glow matching particle color
+                    ctx.shadowBlur = 6 + (this.size * 2);
+                    ctx.shadowColor = `hsla(${this.hue}, ${this.saturation}%, ${this.lightness}%, ${this.life * 0.25})`;
+                }
+            }
+
+            // Track mouse movement
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                isMouseMoving = true;
+
+                // Create fewer particles on mouse move
+                if (Math.random() > 0.5) { // Only create particle 50% of the time for sparser trail
+                    particles.push(new Particle(mouseX, mouseY));
+                }
+
+                // Clear timeout and set new one
+                clearTimeout(mouseTimeout);
+                mouseTimeout = setTimeout(() => {
+                    isMouseMoving = false;
+                }, 100);
+            });
+
+            // CLICK EXPLOSION EFFECT
+            document.addEventListener('mousedown', (e) => {
+                const burstCount = 10; // Slightly fewer particles
+                for (let i = 0; i < burstCount; i++) {
+                    const p = new Particle(e.clientX, e.clientY);
+                    
+                    // Explosion physics: faster speed, random direction
+                    const angle = Math.random() * Math.PI * 2;
+                    const velocity = Math.random() * 3.5 + 1.5; // Speed 1.5-5
+                    
+                    p.speedX = Math.cos(angle) * velocity;
+                    p.speedY = Math.sin(angle) * velocity;
+                    
+                    // Varied colors for explosion too
+                    const explosionColorChoice = Math.random();
+                    if (explosionColorChoice < 0.5) {
+                        p.hue = 190 + Math.random() * 20; // Teal/cyan
+                    } else if (explosionColorChoice < 0.8) {
+                        p.hue = 220 + Math.random() * 20; // Blue
+                    } else {
+                        p.hue = 270 + Math.random() * 30; // Purple
+                    }
+                    
+                    // Smaller explosion particles (1-3px instead of 2-5px)
+                    p.size = Math.random() * 2 + 1;
+                    
+                    particles.push(p);
+                }
+            });
+
+            // Animation loop
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Update and draw particles
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    particles[i].update();
+                    particles[i].draw();
+
+                    // Remove dead particles
+                    if (particles[i].life <= 0 || particles[i].size <= 0.5) {
+                        particles.splice(i, 1);
+                    }
+                }
+
+                // Limit max particles for performance
+                if (particles.length > 150) {
+                    particles.splice(0, particles.length - 150);
+                }
+
+                requestAnimationFrame(animate);
+            }
+            animate();
+        })();
+
+        // ========================================
+        // PARALLAX SCROLLING - "Sliding Planes" Effect
+        // ========================================
+        (function() {
+            if (prefersReducedMotion) return;
+
+            // Target both images and text for that "Apple-style" depth
+            const parallaxElements = document.querySelectorAll('.parallax-img, .parallax-text');
+            if (!parallaxElements.length) return;
+
+            let ticking = false;
+
+            function updateParallax() {
+                const scrollY = window.scrollY;
+                const windowHeight = window.innerHeight;
+
+                parallaxElements.forEach(el => {
+                    // Get speed from data attribute, default to 0 if not set
+                    const speed = parseFloat(el.dataset.parallaxSpeed) || 0;
+                    if (speed === 0) return;
+
+                    const rect = el.getBoundingClientRect();
+                    // We calculate position relative to the viewport center
+                    // This ensures the element is at its "natural" position when in the center of the screen
+                    const elementCenter = rect.top + (rect.height / 2);
+                    const viewportCenter = windowHeight / 2;
+                    
+                    const distanceFromCenter = elementCenter - viewportCenter;
+
+                    // Apply parallax transform
+                    // Negative speed moves against scroll (slower), Positive moves with scroll (faster)
+                    const translateY = distanceFromCenter * speed;
+                    
+                    // Only apply rotation to images, not text
+                    let transformString = `translateY(${translateY}px)`;
+                    
+                    if (el.classList.contains('parallax-img')) {
+                         // Subtle rotation for images only
+                         const rotation = (distanceFromCenter / windowHeight) * 1.5;
+                         transformString += ` rotate(${rotation}deg)`;
+                    }
+
+                    el.style.transform = transformString;
+                });
+
+                ticking = false;
+            }
+
+            window.addEventListener('scroll', () => {
+                if (!ticking) {
+                    requestAnimationFrame(updateParallax);
+                    ticking = true;
+                }
+            });
+
+            // Initial call
+            updateParallax();
+        })();
+
+        // ========================================
+        // POSITIONAL FLOATING - Images float based on vertical position
+        // ========================================
+        (function() {
+            if (prefersReducedMotion) return;
+
+            const floatingImages = document.querySelectorAll('.wiggle-img, .float-y, .float-x');
+            if (!floatingImages.length) return;
+
+            // Add unique offsets based on element position
+            floatingImages.forEach((img, index) => {
+                const rect = img.getBoundingClientRect();
+                const pagePosition = rect.top / document.documentElement.scrollHeight;
+                
+                // Adjust animation duration and delay based on position
+                const baseDuration = 4 + (pagePosition * 3); // 4-7 seconds
+                const delay = (index * 0.3) % 2; // Staggered delays
+                
+                img.style.animationDuration = `${baseDuration}s`;
+                img.style.animationDelay = `-${delay}s`;
+            });
+
+            // Update floating intensity based on scroll position
+            let floatTicking = false;
+
+            function updateFloating() {
+                const scrollY = window.scrollY;
+                const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+                const scrollProgress = scrollY / maxScroll;
+
+                floatingImages.forEach((img, index) => {
+                    const rect = img.getBoundingClientRect();
+                    const isInView = rect.top < window.innerHeight && rect.bottom > 0;
+
+                    if (isInView) {
+                        // Increase animation intensity as user scrolls deeper
+                        const intensity = 1 + (scrollProgress * 0.5);
+                        const verticalOffset = Math.sin((scrollY / 200) + index) * 3 * intensity;
+                        
+                        // Apply subtle additional transform
+                        const currentTransform = img.style.transform || '';
+                        if (!currentTransform.includes('translateY')) {
+                            img.style.setProperty('--float-offset', `${verticalOffset}px`);
+                        }
+                    }
+                });
+
+                floatTicking = false;
+            }
+
+            window.addEventListener('scroll', () => {
+                if (!floatTicking) {
+                    requestAnimationFrame(updateFloating);
+                    floatTicking = true;
+                }
+            });
+        })();
+
+        // ========================================
+        // MOUSE INTERACTION - Images, Steps & Mercury Text
+        // ========================================
+        (function() {
+            if (prefersReducedMotion) return;
+
+            // --- SETUP MERCURY TEXT ---
+            // Wrap text content of headings and key paragraphs in spans to isolate transform
+            const textTargets = document.querySelectorAll('h1, h2, h3, .hero-text p, .comp-header p');
+            const mercuryElements = [];
+
+            textTargets.forEach(el => {
+                // Skip if already processed or has complex children
+                if (el.querySelector('.mercury-span') || el.children.length > 0) return;
+                
+                const originalText = el.innerText;
+                el.innerHTML = `<span class="mercury-span">${originalText}</span>`;
+                const span = el.querySelector('.mercury-span');
+                
+                // Store original color for interpolation
+                const computedStyle = window.getComputedStyle(el);
+                const color = computedStyle.color; // e.g. "rgb(100, 100, 100)"
+                
+                mercuryElements.push({
+                    el: span,
+                    baseColor: color,
+                    x: 0, // Current physics position
+                    y: 0,
+                    vx: 0, // Velocity
+                    vy: 0,
+                    targetX: 0,
+                    targetY: 0
+                });
+            });
+
+            const interactiveImages = document.querySelectorAll('.hero-image-wrapper img, .comp-img img, .gallery-main img');
+            const stepNumbers = document.querySelectorAll('.step-number');
+            
+            // Mouse State
+            let mouseX = 0;
+            let mouseY = 0;
+            let mouseVX = 0; // Mouse Velocity X
+            let mouseVY = 0; // Mouse Velocity Y
+            let lastMouseX = 0;
+            let lastMouseY = 0;
+
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                
+                // Calculate mouse velocity (simple difference)
+                mouseVX = mouseX - lastMouseX;
+                mouseVY = mouseY - lastMouseY;
+                
+                lastMouseX = mouseX;
+                lastMouseY = mouseY;
+
+                // 1. Image Tilt/Move Effect - DISABLED
+                // This was causing too much movement and conflicting with the 3D tilt effect
+                // The 3D tilt in the IMAGE HOVER section handles this more subtly now
+                /*
+                interactiveImages.forEach(img => {
+                    const rect = img.getBoundingClientRect();
+                    const imgCenterX = rect.left + rect.width / 2;
+                    const imgCenterY = rect.top + rect.height / 2;
+                    
+                    const distanceX = e.clientX - imgCenterX;
+                    const distanceY = e.clientY - imgCenterY;
+                    const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+                    
+                    const maxDistance = 500;
+                    if (distance < maxDistance) {
+                        const strength = (1 - distance / maxDistance) * 0.025;
+                        const moveX = distanceX * strength;
+                        const moveY = distanceY * strength;
+                        img.style.transform = `translate(${moveX}px, ${moveY}px) scale(${1 + strength})`;
+                    } else {
+                        img.style.transform = '';
+                    }
+                });
+                */
+
+                // 2. Step Number Glow Effect (Direct Response)
+                stepNumbers.forEach(step => {
+                    const rect = step.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    const dist = Math.hypot(e.clientX - centerX, e.clientY - centerY);
+                    const maxDist = 250;
+                    
+                    if (dist < maxDist) {
+                        const intensity = 1 - (dist / maxDist);
+                        const scale = 1 + (intensity * 0.15);
+                        step.style.setProperty('--glow-opacity', intensity.toFixed(2));
+                        step.style.transform = `scale(${scale})`;
+                        step.style.borderColor = `rgba(8, 145, 178, ${0.5 + (intensity * 0.5)})`;
+                    } else {
+                        step.style.setProperty('--glow-opacity', '0');
+                        step.style.transform = 'scale(1)';
+                        step.style.borderColor = '';
+                    }
+                });
+            });
+
+            // 3. Mercury Text Physics Loop (Runs every frame for smoothness)
+            function animateMercury() {
+                const time = Date.now() * 0.002; // Time factor for orbit
+                
+                mercuryElements.forEach(item => {
+                    const rect = item.el.getBoundingClientRect();
+                    // Skip if off screen
+                    if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    
+                    const dx = mouseX - centerX;
+                    const dy = mouseY - centerY;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const maxDist = 400; // Interaction radius
+
+                    // --- A. COLOR DARKENING ---
+                    if (dist < maxDist) {
+                        // Calculate darkness factor (0 = original, 1 = black)
+                        // We want it to get darker as we get closer
+                        const darkness = Math.pow(1 - (dist / maxDist), 2); // Quadratic falloff for smoothness
+                        
+                        // Simple approach: Mix original color with black
+                        // Assuming original is roughly grey/dark grey, we just darken it.
+                        // For a robust solution without parsing RGB, we can use text-shadow or filter
+                        // But filter:brightness is easiest
+                        const brightness = 1 - (darkness * 0.8); // Go down to 20% brightness
+                        item.el.style.filter = `brightness(${brightness})`;
+                        // Also slight scale up
+                        // item.el.style.letterSpacing = `${-0.02 + (darkness * 0.01)}em`;
+                    } else {
+                        item.el.style.filter = 'brightness(1)';
+                    }
+
+                    // --- B. MOTION (Orbit + Sway) ---
+                    
+                    // 1. Idle Circular Motion (The "Orbit")
+                    // Small radius (2px), slow speed
+                    const orbitX = Math.sin(time + rect.top) * 2;
+                    const orbitY = Math.cos(time + rect.top) * 2;
+
+                    // 2. Velocity Sway (The "Mercury Blob")
+                    // If mouse is close and moving fast, pull the text
+                    let swayForceX = 0;
+                    let swayForceY = 0;
+
+                    if (dist < maxDist) {
+                        // The "Blob" effect:
+                        // If moving quickly, the text should "drag" or "lag" behind slightly,
+                        // or "bulge" towards the movement.
+                        // Let's make it "magnetic" but fluid.
+                        
+                        const velocityInfluence = 0.15; // How much mouse speed affects it
+                        const proximityInfluence = 1 - (dist / maxDist);
+                        
+                        // Add mouse velocity to target position (creates the sway/drag)
+                        swayForceX = mouseVX * velocityInfluence * proximityInfluence;
+                        swayForceY = mouseVY * velocityInfluence * proximityInfluence;
+                    }
+
+                    // Physics: Spring to target
+                    // Target is Orbit + Sway
+                    const targetX = orbitX + swayForceX;
+                    const targetY = orbitY + swayForceY;
+
+                    // Lerp current position to target (Elasticity)
+                    // Lower factor = more "heavy/mercury" feel (0.05 - 0.1)
+                    item.x += (targetX - item.x) * 0.08;
+                    item.y += (targetY - item.y) * 0.08;
+
+                    item.el.style.transform = `translate(${item.x}px, ${item.y}px)`;
+                });
+
+                // Decay mouse velocity (friction) so sway settles
+                mouseVX *= 0.9;
+                mouseVY *= 0.9;
+
+                requestAnimationFrame(animateMercury);
+            }
+            
+            animateMercury();
+
+        })();
+        // ========================================
+        // MERCURY BLOB CURSOR - Physics-based water droplet with satellites
+        // ========================================
+        (function() {
+            if (prefersReducedMotion) return;
+            
+            const orb = document.getElementById('mercuryOrb');
+            const satelliteEls = document.querySelectorAll('.satellite-droplet');
+            if (!orb) return;
+
+            // Main blob physics state
+            let orbX = window.innerWidth / 2;
+            let orbY = window.innerHeight / 2;
+            let orbVX = 0;
+            let orbVY = 0;
+            let targetX = orbX;
+            let targetY = orbY;
+            let isVisible = false;
+
+            // WEAKER SPRING = more slosh, more floaty
+            const SPRING = 0.045;      // Weaker pull (was 0.08)
+            const FRICTION = 0.82;     // More slippery (was 0.75)
+            const VELOCITY_SCALE = 0.5; // More stretch (was 0.35)
+
+            // Satellite droplet physics - each has its own state
+            const satellites = [];
+            satelliteEls.forEach((el, i) => {
+                satellites.push({
+                    el: el,
+                    x: 0,
+                    y: 0,
+                    vx: 0,
+                    vy: 0,
+                    // Each satellite has different physics (weaker connection)
+                    spring: 0.02 + (i * 0.008),  // 0.02, 0.028, 0.036
+                    friction: 0.88 - (i * 0.02), // 0.88, 0.86, 0.84
+                    offset: (i + 1) * 120,       // Angle offset for orbit
+                    orbitRadius: 8 + (i * 4),    // Distance from main blob
+                    active: false
+                });
+            });
+
+            // Track mouse velocity
+            let lastMouseX = 0;
+            let lastMouseY = 0;
+            let mouseSpeed = 0;
+
+            document.addEventListener('mousemove', (e) => {
+                const dx = e.clientX - lastMouseX;
+                const dy = e.clientY - lastMouseY;
+                mouseSpeed = Math.sqrt(dx * dx + dy * dy);
+                lastMouseX = e.clientX;
+                lastMouseY = e.clientY;
+
+                targetX = e.clientX;
+                targetY = e.clientY;
+                
+                if (!isVisible) {
+                    isVisible = true;
+                    orbX = e.clientX;
+                    orbY = e.clientY;
+                    orb.classList.add('is-visible');
+                    // Initialize satellites at orb position
+                    satellites.forEach(s => {
+                        s.x = orbX;
+                        s.y = orbY;
+                    });
+                }
+            });
+
+            document.addEventListener('mouseleave', () => {
+                isVisible = false;
+                orb.classList.remove('is-visible');
+                satellites.forEach(s => {
+                    s.active = false;
+                    s.el.classList.remove('is-active');
+                });
+            });
+
+            // Main animation loop
+            let time = 0;
+            function animateBlob() {
+                time += 0.03;
+
+                // === MAIN BLOB PHYSICS ===
+                const dx = targetX - orbX;
+                const dy = targetY - orbY;
+                
+                orbVX += dx * SPRING;
+                orbVY += dy * SPRING;
+                orbVX *= FRICTION;
+                orbVY *= FRICTION;
+                orbX += orbVX;
+                orbY += orbVY;
+
+                const speed = Math.sqrt(orbVX * orbVX + orbVY * orbVY);
+                const angle = Math.atan2(orbVY, orbVX) * (180 / Math.PI);
+                
+                // More pronounced stretch
+                const stretchAmount = Math.min(speed * VELOCITY_SCALE, 2);
+                const scaleX = 1 + stretchAmount * 0.5;
+                const scaleY = 1 - stretchAmount * 0.2;
+                
+                const minSpeed = 0.3;
+                const finalScaleX = speed > minSpeed ? scaleX : 1 + (scaleX - 1) * (speed / minSpeed);
+                const finalScaleY = speed > minSpeed ? scaleY : 1 + (scaleY - 1) * (speed / minSpeed);
+
+                orb.style.left = orbX + 'px';
+                orb.style.top = orbY + 'px';
+                orb.style.transform = `translate(-50%, -50%) rotate(${angle}deg) scale(${finalScaleX}, ${finalScaleY})`;
+
+                // === SATELLITE DROPLET PHYSICS ===
+                satellites.forEach((sat, i) => {
+                    // Satellites become active when moving fast enough
+                    const activationThreshold = 3 + (i * 2); // First activates easiest
+                    
+                    if (speed > activationThreshold && !sat.active) {
+                        sat.active = true;
+                        sat.el.classList.add('is-active');
+                        // Launch satellite from current orb position with some inherited velocity
+                        sat.x = orbX;
+                        sat.y = orbY;
+                        sat.vx = orbVX * (0.8 - i * 0.15);
+                        sat.vy = orbVY * (0.8 - i * 0.15);
+                    }
+                    
+                    if (sat.active) {
+                        // Satellites orbit around the main blob with their own physics
+                        // They're pulled to a point that orbits around the main blob
+                        const orbitAngle = time * (1.5 - i * 0.3) + sat.offset * (Math.PI / 180);
+                        const targetSatX = orbX + Math.cos(orbitAngle) * sat.orbitRadius;
+                        const targetSatY = orbY + Math.sin(orbitAngle) * sat.orbitRadius;
+                        
+                        // VERY weak spring - they float loosely
+                        const satDx = targetSatX - sat.x;
+                        const satDy = targetSatY - sat.y;
+                        
+                        sat.vx += satDx * sat.spring;
+                        sat.vy += satDy * sat.spring;
+                        sat.vx *= sat.friction;
+                        sat.vy *= sat.friction;
+                        sat.x += sat.vx;
+                        sat.y += sat.vy;
+
+                        // Position and slight scale based on velocity
+                        const satSpeed = Math.sqrt(sat.vx * sat.vx + sat.vy * sat.vy);
+                        const satScale = 1 + Math.min(satSpeed * 0.1, 0.5);
+                        
+                        sat.el.style.left = sat.x + 'px';
+                        sat.el.style.top = sat.y + 'px';
+                        sat.el.style.transform = `translate(-50%, -50%) scale(${satScale})`;
+
+                        // Deactivate if main blob is slow and satellite is close
+                        if (speed < 1 && Math.abs(satDx) < 5 && Math.abs(satDy) < 5) {
+                            sat.active = false;
+                            sat.el.classList.remove('is-active');
+                        }
+                    }
+                });
+
+                requestAnimationFrame(animateBlob);
+            }
+            
+            animateBlob();
+        })();
+
+        // ========================================
+        // COMPARISON CARDS - Gradual Differential Parallax & Section Blur
+        // Uses continuous RAF loop to work with Mac momentum scrolling
+        // ========================================
+        (function() {
+            if (prefersReducedMotion) return;
+
+            const problemSolutionSection = document.querySelector('.problem-solution');
+            const compCards = document.querySelectorAll('.comp-card');
+            if (!compCards.length || !problemSolutionSection) return;
+
+            // Track current animated positions for smooth interpolation
+            let currentOffsets = [0, 0];
+            let lastScrollY = window.scrollY;
+
+            function updateCompCards() {
+                const windowHeight = window.innerHeight;
+                const scrollY = window.scrollY;
+                const sectionRect = problemSolutionSection.getBoundingClientRect();
+                
+                // Get the section's position relative to document
+                const sectionTop = sectionRect.top + scrollY;
+                const sectionHeight = sectionRect.height;
+                
+                // Calculate total scroll distance for the effect
+                // Start when section is 1.5 viewport heights away (very early)
+                // End when section has scrolled 1 viewport height past
+                const effectStart = sectionTop - (windowHeight * 1.5);
+                const effectEnd = sectionTop + sectionHeight + (windowHeight * 0.5);
+                const effectRange = effectEnd - effectStart;
+                
+                // Calculate progress through this range (0 = just starting, 1 = finished)
+                const scrollProgress = (scrollY - effectStart) / effectRange;
+                const clampedProgress = Math.min(Math.max(scrollProgress, 0), 1);
+
+                // Apply subtle blur to entire section when scrolling far from center
+                const windowCenter = windowHeight / 2;
+                const sectionCenter = sectionRect.top + sectionRect.height / 2;
+                const sectionDistanceFromCenter = Math.abs(sectionCenter - windowCenter);
+                const normalizedSectionDistance = sectionDistanceFromCenter / windowHeight;
+
+                if (normalizedSectionDistance > 0.8) {
+                    problemSolutionSection.classList.add('is-section-blurring');
+                } else {
+                    problemSolutionSection.classList.remove('is-section-blurring');
+                }
+
+                // Apply differential vertical parallax to each card
+                // Cards move AWAY from each other as you scroll through
+                compCards.forEach((card, index) => {
+                    // MUCH LARGER movement - Problem card goes UP, Solution card goes DOWN
+                    // This creates a "spreading apart" effect
+                    const maxOffset = index === 0 ? -120 : 120; // 120px each direction
+                    
+                    // Center the movement around 0.5 progress so cards move from -half to +half
+                    const centeredProgress = (clampedProgress - 0.5) * 2; // -1 to 1
+                    
+                    // Calculate target offset
+                    const targetOffset = maxOffset * centeredProgress;
+                    
+                    // Smooth interpolation (lerp) for buttery animation even during momentum scroll
+                    // Higher value = more responsive, lower = smoother
+                    const lerpFactor = 0.12;
+                    currentOffsets[index] += (targetOffset - currentOffsets[index]) * lerpFactor;
+                    
+                    // Apply transform
+                    card.style.transform = `translateY(${currentOffsets[index]}px)`;
+                });
+
+                lastScrollY = scrollY;
+
+                // Continue the animation loop
+                requestAnimationFrame(updateCompCards);
+            }
+
+            // Start the continuous animation loop
+            requestAnimationFrame(updateCompCards);
+        })();
+
+        // ========================================
+        // FAQ ITEMS - Subtle Staggered Parallax
+        // ========================================
+        (function() {
+            if (prefersReducedMotion) return;
+
+            const faqSection = document.querySelector('.faq');
+            const faqItems = document.querySelectorAll('.faq-item');
+            if (!faqItems.length || !faqSection) return;
+
+            // MUCH subtler alternating up/down pattern - reduced to prevent overlap
+            const faqConfigs = [
+                { maxOffset: -15 },   // up
+                { maxOffset: 12 },    // down
+                { maxOffset: -10 },   // up smaller
+                { maxOffset: 18 },    // down
+                { maxOffset: -14 },   // up
+                { maxOffset: 10 },    // down smaller
+                { maxOffset: -12 }    // up
+            ];
+            
+            let faqOffsets = new Array(faqItems.length).fill(0);
+
+            function updateFaqItems() {
+                const windowHeight = window.innerHeight;
+                const scrollY = window.scrollY;
+                const sectionRect = faqSection.getBoundingClientRect();
+                
+                const sectionTop = sectionRect.top + scrollY;
+                const sectionHeight = sectionRect.height;
+                
+                const effectStart = sectionTop - (windowHeight * 1.2);
+                const effectEnd = sectionTop + sectionHeight + (windowHeight * 0.3);
+                const effectRange = effectEnd - effectStart;
+                
+                const scrollProgress = (scrollY - effectStart) / effectRange;
+                const clampedProgress = Math.min(Math.max(scrollProgress, 0), 1);
+
+                faqItems.forEach((item, index) => {
+                    const config = faqConfigs[index % faqConfigs.length];
+                    const centeredProgress = (clampedProgress - 0.5) * 2;
+                    const targetOffset = config.maxOffset * centeredProgress;
+                    
+                    const lerpFactor = 0.08; // Very smooth
+                    faqOffsets[index] += (targetOffset - faqOffsets[index]) * lerpFactor;
+                    
+                    item.style.transform = `translateY(${faqOffsets[index]}px)`;
+                });
+
+                requestAnimationFrame(updateFaqItems);
+            }
+
+            requestAnimationFrame(updateFaqItems);
+        })();
+
+        // ========================================
+        // HOW IT WORKS STEPS - Subtle Parallax
+        // ========================================
+        (function() {
+            if (prefersReducedMotion) return;
+
+            const howSection = document.querySelector('.how-it-works');
+            const stepItems = document.querySelectorAll('.step-item');
+            if (!stepItems.length || !howSection) return;
+
+            // Different rates for each step
+            const stepConfigs = [
+                { maxOffset: -60 },   // Step 1
+                { maxOffset: 50 },    // Step 2 (opposite)
+                { maxOffset: -45 }    // Step 3
+            ];
+            
+            let stepOffsets = [0, 0, 0];
+
+            function updateStepItems() {
+                const windowHeight = window.innerHeight;
+                const scrollY = window.scrollY;
+                const sectionRect = howSection.getBoundingClientRect();
+                
+                const sectionTop = sectionRect.top + scrollY;
+                const sectionHeight = sectionRect.height;
+                
+                const effectStart = sectionTop - (windowHeight * 1.3);
+                const effectEnd = sectionTop + sectionHeight + (windowHeight * 0.4);
+                const effectRange = effectEnd - effectStart;
+                
+                const scrollProgress = (scrollY - effectStart) / effectRange;
+                const clampedProgress = Math.min(Math.max(scrollProgress, 0), 1);
+
+                stepItems.forEach((item, index) => {
+                    const config = stepConfigs[index] || stepConfigs[0];
+                    const centeredProgress = (clampedProgress - 0.5) * 2;
+                    const targetOffset = config.maxOffset * centeredProgress;
+                    
+                    const lerpFactor = 0.09;
+                    stepOffsets[index] += (targetOffset - stepOffsets[index]) * lerpFactor;
+                    
+                    item.style.transform = `translateY(${stepOffsets[index]}px)`;
+                });
+
+                requestAnimationFrame(updateStepItems);
+            }
+
+            requestAnimationFrame(updateStepItems);
+        })();
+
+        // ========================================
+        // BENEFITS CARDS - Varied Parallax (Different Random Rates)
+        // ========================================
+        (function() {
+            if (prefersReducedMotion) return;
+
+            const benefitsSection = document.querySelector('.benefits');
+            const benefitCards = document.querySelectorAll('.benefit-card');
+            if (!benefitCards.length || !benefitsSection) return;
+
+            // Each card gets a different movement direction and amount
+            // Some go up, some go down, at different rates
+            const cardConfigs = [
+                { maxOffset: -140, direction: -1 },  // Card 1: moves up a lot
+                { maxOffset: 100, direction: 1 },    // Card 2: moves down
+                { maxOffset: -80, direction: -1 },   // Card 3: moves up less
+                { maxOffset: 130, direction: 1 }     // Card 4: moves down a lot
+            ];
+            
+            // Track current animated positions for smooth interpolation
+            let benefitOffsets = [0, 0, 0, 0];
+
+            function updateBenefitCards() {
+                const windowHeight = window.innerHeight;
+                const scrollY = window.scrollY;
+                const sectionRect = benefitsSection.getBoundingClientRect();
+                
+                // Get the section's position relative to document
+                const sectionTop = sectionRect.top + scrollY;
+                const sectionHeight = sectionRect.height;
+                
+                // Calculate total scroll distance for the effect
+                // Start early, continue late
+                const effectStart = sectionTop - (windowHeight * 1.5);
+                const effectEnd = sectionTop + sectionHeight + (windowHeight * 0.5);
+                const effectRange = effectEnd - effectStart;
+                
+                // Calculate progress (0 = just starting, 1 = finished)
+                const scrollProgress = (scrollY - effectStart) / effectRange;
+                const clampedProgress = Math.min(Math.max(scrollProgress, 0), 1);
+
+                // Apply parallax to each benefit card
+                benefitCards.forEach((card, index) => {
+                    const config = cardConfigs[index] || cardConfigs[0];
+                    
+                    // Center the movement around 0.5 progress
+                    const centeredProgress = (clampedProgress - 0.5) * 2; // -1 to 1
+                    
+                    // Calculate target offset
+                    const targetOffset = config.maxOffset * centeredProgress;
+                    
+                    // Smooth lerp interpolation
+                    const lerpFactor = 0.1; // Slightly slower for smoother feel
+                    benefitOffsets[index] += (targetOffset - benefitOffsets[index]) * lerpFactor;
+                    
+                    // Apply transform (keep any existing transforms from hover)
+                    card.style.transform = `translateY(${benefitOffsets[index]}px)`;
+                });
+
+                requestAnimationFrame(updateBenefitCards);
+            }
+
+            // Start the continuous animation loop
+            requestAnimationFrame(updateBenefitCards);
+        })();
+
+        // ========================================
+        // REVIEW CARD 3D TILT EFFECT
+        // ========================================
+        (function() {
+            if (prefersReducedMotion) return;
+
+            const reviewCards = document.querySelectorAll('.review-card');
+            if (!reviewCards.length) return;
+
+            reviewCards.forEach(card => {
+                // Track mouse position relative to card center
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const cardCenterX = rect.left + rect.width / 2;
+                    const cardCenterY = rect.top + rect.height / 2;
+                    
+                    // Calculate distance from center (normalized to -1 to 1)
+                    const mouseX = (e.clientX - cardCenterX) / (rect.width / 2);
+                    const mouseY = (e.clientY - cardCenterY) / (rect.height / 2);
+                    
+                    // Apply subtle rotation (max 4 degrees) and slight lift
+                    const rotateY = mouseX * 4; // Tilt left/right
+                    const rotateX = -mouseY * 4; // Tilt up/down (inverted for natural feel)
+                    const translateY = -4; // Slight lift on hover
+                    
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(${translateY}px)`;
+                });
+
+                // Reset on mouse leave
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
+                });
+            });
+        })();
+
+        // ========================================
+        // FINAL ENHANCEMENTS (Typography, Ripple, Warmth)
+        // ========================================
+        (function() {
+            // Guard prefersReducedMotion and viewport info
+            const reduceMotion = typeof prefersReducedMotion !== 'undefined' && prefersReducedMotion;
+            const isSmallScreen = window.matchMedia && window.matchMedia('(max-width: 767px)').matches;
+
+            // 1. Button Ripple Effect (desktop only, no reduced motion)
+            if (!reduceMotion && !isSmallScreen) {
+                const buttons = document.querySelectorAll('.btn');
+                buttons.forEach(btn => {
+                    btn.addEventListener('click', function (e) {
+                        const rect = this.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+                        const ripple = document.createElement('span');
+                        ripple.className = 'ripple';
+                        ripple.style.left = x + 'px';
+                        ripple.style.top = y + 'px';
+                        this.appendChild(ripple);
+                        setTimeout(() => ripple.remove(), 600);
+                    });
+                });
+            }
+
+            // 2. Calm scroll hint (delay + slightly softer)
+            const hero = document.querySelector('.hero');
+            if (hero) {
+                const scrollHint = document.createElement('div');
+                scrollHint.className = 'scroll-hint';
+                scrollHint.innerHTML = '<span>Scroll to explore</span><div class="arrow-down" aria-hidden="true"></div>';
+                hero.appendChild(scrollHint);
+
+                // small delay and softer opacity
+                scrollHint.style.animationDelay = '0.8s';
+                scrollHint.style.opacity = '0.7';
+
+                // fade scroll hint out as user scrolls past hero
+                window.addEventListener('scroll', () => {
+                    const rect = hero.getBoundingClientRect();
+                    const progress = Math.min(Math.max(-rect.top / rect.height, 0), 1);
+                    scrollHint.style.opacity = String(0.7 * (1 - progress));
+                });
+            }
+
+            // 3. Hide particle canvas on small screens (keeps desktop effect)
+            if (isSmallScreen) {
+                const canvas = document.getElementById('particleCanvas');
+                if (canvas) canvas.style.display = 'none';
+            }
+
+            // 4. Mobile CTA bar visibility based on scroll (only on mobile)
+            const mobileCta = document.getElementById('mobileCtaBar');
+            const heroSection = document.querySelector('.hero');
+            if (isSmallScreen && mobileCta && heroSection) {
+                const toggleMobileCta = () => {
+                    const rect = heroSection.getBoundingClientRect();
+                    const pastHero = rect.bottom < (window.innerHeight * 0.6);
+                    
+                    if (pastHero) {
+                        mobileCta.setAttribute('aria-hidden', 'false');
+                        mobileCta.style.display = 'flex';
+                    } else {
+                        mobileCta.setAttribute('aria-hidden', 'true');
+                        mobileCta.style.display = 'none';
+                    }
+                };
+                
+                // Initial check
+                toggleMobileCta();
+                
+                // Throttled scroll listener
+                let ticking = false;
+                window.addEventListener('scroll', () => {
+                    if (!ticking) {
+                        window.requestAnimationFrame(() => {
+                            toggleMobileCta();
+                            ticking = false;
+                        });
+                        ticking = true;
+                    }
+                });
+            }
+        })();
+
+        // ========================================
+        // IMAGE HOVER: 3D TILT + WATER SPLASH EFFECT
+        // Applies to ALL images on the page
+        // - 3D tilt: Image pivots around center based on cursor position
+        // - Water splash: Droplets spawn where cursor hits with larger radius
+        // ========================================
+        (function() {
+            if (prefersReducedMotion) return;
+            
+            // Check for touch devices / small screens
+            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            const isSmallScreen = window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
+            if (isTouchDevice || isSmallScreen) return;
+            
+            // Configuration
+            const CONFIG = {
+                // 3D Tilt settings - REDUCED for subtlety
+                maxTiltDegrees: 4,            // Maximum rotation in degrees (was 12, now much subtler)
+                tiltSmoothing: 0.08,          // Lerp factor (lower = smoother/slower)
+                perspective: 1200,            // CSS perspective value (higher = less dramatic)
+                
+                // Splash settings - VERY SUBTLE
+                splashRadius: 20,             // Radius around cursor for splash spawning (smaller)
+                splashRate: 120,              // ms between splash spawns (less frequent)
+                dropletCount: 3,              // Droplets per spawn (same count)
+                dropletMinSize: 2,            // Minimum droplet size in px (very small)
+                dropletMaxSize: 5,            // Maximum droplet size in px (very small)
+                dropletLifespan: 600,         // How long droplets live in ms (much shorter)
+                dropletVelocity: 1.5,         // Base velocity for droplets (very slow)
+                dropletOpacity: 0.5,          // Starting opacity for droplets (reduced)
+                rippleEnabled: true,          // Show expanding ripple rings
+                rippleInterval: 350           // ms between ripples (less frequent)
+            };
+            
+            // Select ALL images on the page
+            const allImages = document.querySelectorAll('img');
+            
+            // Track state for each image
+            const imageStates = new Map();
+            
+            allImages.forEach(img => {
+                // Skip very tiny images (icons, etc.) and images that might be problematic
+                // Using naturalWidth/Height as backup since width/height might be 0 before load
+                const imgWidth = img.width || img.naturalWidth || 100;
+                const imgHeight = img.height || img.naturalHeight || 100;
+                if (imgWidth < 30 || imgHeight < 30) return;
+                if (img.closest('.satellite-droplet, .mercury-orb, .particle-canvas')) return;
+                
+                // Create state object for this image
+                const state = {
+                    currentTiltX: 0,
+                    currentTiltY: 0,
+                    targetTiltX: 0,
+                    targetTiltY: 0,
+                    isHovering: false,
+                    lastSplashTime: 0,
+                    lastRippleTime: 0,
+                    animationFrame: null,
+                    splashContainer: null
+                };
+                imageStates.set(img, state);
+                
+                // Get or create parent wrapper for proper positioning
+                const parent = img.parentElement;
+                if (parent) {
+                    parent.style.position = parent.style.position || 'relative';
+                    parent.style.overflow = 'hidden'; // CHANGED: hidden to prevent background showing through on tilt
+                    
+                    // Create splash container for this image
+                    const splashContainer = document.createElement('div');
+                    splashContainer.className = 'image-splash-container';
+                    parent.appendChild(splashContainer);
+                    state.splashContainer = splashContainer;
+                }
+                
+                // Scale image slightly larger than container to hide edges during tilt
+                img.style.width = '102%';
+                img.style.height = '102%';
+                img.style.objectFit = 'cover';
+                img.style.margin = '-1%';
+                
+                // Set up transform origin at center
+                img.style.transformOrigin = 'center center';
+                img.style.transition = 'transform 0.1s ease-out';
+                
+                // ========== MOUSE ENTER ==========
+                img.addEventListener('mouseenter', () => {
+                    state.isHovering = true;
+                    startTiltAnimation(img, state);
+                });
+                
+                // ========== MOUSE MOVE ==========
+                img.addEventListener('mousemove', (e) => {
+                    if (!state.isHovering) return;
+                    
+                    const rect = img.getBoundingClientRect();
+                    const imgCenterX = rect.left + rect.width / 2;
+                    const imgCenterY = rect.top + rect.height / 2;
+                    
+                    // Calculate cursor position relative to image center (-1 to 1)
+                    const relativeX = (e.clientX - imgCenterX) / (rect.width / 2);
+                    const relativeY = (e.clientY - imgCenterY) / (rect.height / 2);
+                    
+                    // Clamp to -1 to 1 range
+                    const clampedX = Math.max(-1, Math.min(1, relativeX));
+                    const clampedY = Math.max(-1, Math.min(1, relativeY));
+                    
+                    // Set target tilt (note: rotateX tilts forward/back, rotateY tilts left/right)
+                    // When cursor is at top (relativeY = -1), tilt forward (rotateX positive)
+                    // When cursor is at left (relativeX = -1), tilt right edge toward viewer (rotateY negative)
+                    state.targetTiltX = -clampedY * CONFIG.maxTiltDegrees;
+                    state.targetTiltY = clampedX * CONFIG.maxTiltDegrees;
+                    
+                    // Spawn splash droplets
+                    const now = Date.now();
+                    if (now - state.lastSplashTime > CONFIG.splashRate) {
+                        spawnSplashDroplets(e.clientX, e.clientY, rect, state);
+                        state.lastSplashTime = now;
+                    }
+                    
+                    // Spawn ripple occasionally
+                    if (CONFIG.rippleEnabled && now - state.lastRippleTime > CONFIG.rippleInterval) {
+                        spawnRipple(e.clientX, e.clientY, rect, state);
+                        state.lastRippleTime = now;
+                    }
+                });
+                
+                // ========== MOUSE LEAVE ==========
+                img.addEventListener('mouseleave', () => {
+                    state.isHovering = false;
+                    state.targetTiltX = 0;
+                    state.targetTiltY = 0;
+                    // Animation will continue to reset smoothly
+                });
+            });
+            
+            // ========== TILT ANIMATION LOOP ==========
+            function startTiltAnimation(img, state) {
+                if (state.animationFrame) return; // Already running
+                
+                function animate() {
+                    // Lerp current values toward target
+                    state.currentTiltX += (state.targetTiltX - state.currentTiltX) * CONFIG.tiltSmoothing;
+                    state.currentTiltY += (state.targetTiltY - state.currentTiltY) * CONFIG.tiltSmoothing;
+                    
+                    // Apply transform
+                    img.style.transform = `perspective(${CONFIG.perspective}px) rotateX(${state.currentTiltX}deg) rotateY(${state.targetTiltY}deg)`;
+                    
+                    // Continue animation if hovering OR still returning to rest
+                    const isAtRest = Math.abs(state.currentTiltX) < 0.1 && Math.abs(state.currentTiltY) < 0.1;
+                    
+                    if (state.isHovering || !isAtRest) {
+                        state.animationFrame = requestAnimationFrame(animate);
+                    } else {
+                        // Reset to exactly 0 and stop
+                        img.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
+                        state.animationFrame = null;
+                    }
+                }
+                
+                state.animationFrame = requestAnimationFrame(animate);
+            }
+            
+            // ========== SPAWN SPLASH DROPLETS ==========
+            function spawnSplashDroplets(mouseX, mouseY, imgRect, state) {
+                if (!state.splashContainer) return;
+                
+                // Calculate position relative to image
+                const localX = mouseX - imgRect.left;
+                const localY = mouseY - imgRect.top;
+                
+                for (let i = 0; i < CONFIG.dropletCount; i++) {
+                    const droplet = document.createElement('div');
+                    droplet.className = 'image-hover-droplet';
+                    
+                    // Random offset within splash radius
+                    const angle = Math.random() * Math.PI * 2;
+                    const distance = Math.random() * CONFIG.splashRadius;
+                    const offsetX = Math.cos(angle) * distance;
+                    const offsetY = Math.sin(angle) * distance;
+                    
+                    // Random size
+                    const size = CONFIG.dropletMinSize + Math.random() * (CONFIG.dropletMaxSize - CONFIG.dropletMinSize);
+                    
+                    // Set initial position
+                    const startX = localX + offsetX;
+                    const startY = localY + offsetY;
+                    
+                    droplet.style.width = size + 'px';
+                    droplet.style.height = size + 'px';
+                    droplet.style.left = startX + 'px';
+                    droplet.style.top = startY + 'px';
+                    droplet.style.opacity = String(CONFIG.dropletOpacity);
+                    
+                    // Vary the droplet color slightly
+                    const hueShift = (Math.random() - 0.5) * 20;
+                    droplet.style.filter = `hue-rotate(${hueShift}deg)`;
+                    
+                    state.splashContainer.appendChild(droplet);
+                    
+                    // Animate the droplet
+                    animateDroplet(droplet, startX, startY, angle);
+                }
+            }
+            
+            // ========== ANIMATE INDIVIDUAL DROPLET ==========
+            function animateDroplet(droplet, startX, startY, angle) {
+                let x = startX;
+                let y = startY;
+                
+                // Random velocity direction (outward from spawn point)
+                const speed = CONFIG.dropletVelocity * (0.5 + Math.random() * 0.5);
+                let vx = Math.cos(angle) * speed;
+                let vy = Math.sin(angle) * speed;
+                
+                // Physics
+                const gravity = 0.15;
+                const friction = 0.96;
+                
+                let life = 0;
+                const maxLife = CONFIG.dropletLifespan / 16; // Convert to frames (~60fps)
+                let scale = 1;
+                let rotation = Math.random() * 360;
+                const rotationSpeed = (Math.random() - 0.5) * 8;
+                
+                function animate() {
+                    life++;
+                    
+                    // Apply physics
+                    vx *= friction;
+                    vy *= friction;
+                    vy += gravity;
+                    x += vx;
+                    y += vy;
+                    rotation += rotationSpeed;
+                    
+                    // Calculate fade and scale
+                    const progress = life / maxLife;
+                    const opacity = Math.max(0, CONFIG.dropletOpacity * (1 - Math.pow(progress, 0.6)));
+                    scale = 1 - (progress * 0.3);
+                    
+                    // Apply transforms
+                    droplet.style.left = x + 'px';
+                    droplet.style.top = y + 'px';
+                    droplet.style.opacity = opacity;
+                    droplet.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
+                    
+                    if (life < maxLife && opacity > 0.01) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        droplet.remove();
+                    }
+                }
+                
+                // Small random delay for natural feel
+                setTimeout(() => requestAnimationFrame(animate), Math.random() * 30);
+            }
+            
+            // ========== SPAWN RIPPLE RING ==========
+            function spawnRipple(mouseX, mouseY, imgRect, state) {
+                if (!state.splashContainer) return;
+                
+                const ripple = document.createElement('div');
+                ripple.className = 'image-hover-ripple';
+                
+                // Position at cursor
+                const localX = mouseX - imgRect.left;
+                const localY = mouseY - imgRect.top;
+                
+                ripple.style.left = localX + 'px';
+                ripple.style.top = localY + 'px';
+                ripple.style.width = '6px';
+                ripple.style.height = '6px';
+                ripple.style.opacity = '0.35';
+                
+                state.splashContainer.appendChild(ripple);
+                
+                // Animate ripple expansion
+                let size = 10;
+                let opacity = 0.6;
+                let life = 0;
+                const maxLife = 35;
+                
+                function animateRipple() {
+                    life++;
+                    size += 4;
+                    opacity = 0.35 * (1 - life / maxLife);
+                    
+                    ripple.style.width = size + 'px';
+                    ripple.style.height = size + 'px';
+                    ripple.style.opacity = opacity;
+                    
+                    if (life < maxLife) {
+                        requestAnimationFrame(animateRipple);
+                    } else {
+                        ripple.remove();
+                    }
+                }
+                
+                requestAnimationFrame(animateRipple);
+            }
+            
+        })();
+    </script>
+
+    <style>
+        /* ENHANCED TYPOGRAPHY & ACCESSIBILITY */
+        body {
+            font-size: 18px; /* Slightly larger base size for readability */
+        }
+        p {
+            line-height: 1.7;
+            color: #374151; /* Softer than pure black */
+        }
+        
+        /* WARMER FOOTER */
+        footer {
+            background: #E5E7EB !important; /* Warmer grey */
+            border-top: 1px solid #D1D5DB;
+        }
+
+        /* RIPPLE EFFECT */
+        .btn {
+            position: relative;
+            overflow: hidden;
+        }
+        .ripple {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            animation: rippleEffect 0.6s ease-out forwards; /* single, soft pulse */
+        }
+        @keyframes rippleEffect {
+            0%   { width: 0; height: 0; opacity: 0.4; }
+            100% { width: 260px; height: 260px; opacity: 0; }
+        }
+
+        /* SCROLL HINT */
+        .scroll-hint {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            opacity: 0.8;
+            animation: floatHint 2s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .scroll-hint span {
+            font-size: 0.875rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--color-text-muted);
+        }
+        .arrow-down {
+            width: 12px;
+            height: 12px;
+            border-right: 2px solid var(--color-accent);
+            border-bottom: 2px solid var(--color-accent);
+            transform: rotate(45deg);
+        }
+        @keyframes floatHint {
+            0%, 100% { transform: translate(-50%, 0); }
+            50% { transform: translate(-50%, 10px); }
+        }
+    </style>
+</body>
+</html>
