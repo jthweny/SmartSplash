@@ -870,119 +870,223 @@
             filter: blur(0);
         }
 
-        /* HEADER - Frosted Glass / Condensation Effect */
+        /* HEADER - Realistic Frosted Glass with Dynamic Condensation */
         header {
             position: fixed;
             top: 0;
             left: 0;
-            right: 0; /* Use left/right instead of width:100% to prevent overflow */
+            right: 0;
             width: auto;
             height: var(--header-height);
             z-index: 100;
-            transition: all 0.4s ease-out;
+            transition: background 0.6s ease-out, backdrop-filter 0.6s ease-out, box-shadow 0.4s ease-out;
             display: flex;
             align-items: center;
-            /* Initial state - subtle frosted glass */
-            background: linear-gradient(
-                180deg,
-                rgba(255, 255, 255, 0.7) 0%,
-                rgba(240, 250, 255, 0.5) 50%,
-                rgba(220, 245, 255, 0.4) 100%
-            );
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            /* Frosted glass base - stable blue-tinted, with subtle hover-time fade */
+            --hover-fade: 0;
+            --panel-fade: 0;
+            background:
+                /* Subtle brightness gradient for tilt illusion - brighter at top (closer to viewer) */
+                linear-gradient(
+                    178deg,
+                    rgba(255, 255, 255, 0.14) 0%,
+                    rgba(255, 255, 255, 0.06) 40%,
+                    rgba(255, 255, 255, 0.02) 100%
+                ),
+                /* Main frosted glass with aqua tint */
+                linear-gradient(
+                    175deg,
+                    rgba(175, 220, 245, calc(0.78 - var(--hover-fade, 0) * 0.04)) 0%,
+                    rgba(160, 210, 240, calc(0.74 - var(--hover-fade, 0) * 0.035)) 25%,
+                    rgba(148, 200, 235, calc(0.72 - var(--hover-fade, 0) * 0.035)) 50%,
+                    rgba(155, 205, 238, calc(0.73 - var(--hover-fade, 0) * 0.035)) 75%,
+                    rgba(168, 215, 242, calc(0.76 - var(--hover-fade, 0) * 0.04)) 100%
+                );
+            backdrop-filter: blur(18px) saturate(1.55) brightness(calc(1.04 - var(--hover-fade, 0) * 0.025));
+            -webkit-backdrop-filter: blur(18px) saturate(1.55) brightness(calc(1.04 - var(--hover-fade, 0) * 0.025));
+            overflow: hidden;
+            /* Subtle inner shadow for glass depth */
+            box-shadow:
+                inset 0 -1px 0 rgba(255, 255, 255, 0.15),
+                inset 0 1px 2px rgba(255, 255, 255, 0.08),
+                0 1px 3px rgba(0, 50, 80, 0.06);
         }
 
-        /* Condensation overlay - subtle water droplet texture */
-        header::before {
-            content: '';
+        /* Canvas layer for dynamic condensation spots */
+        .condensation-canvas {
             position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background:
-                /* Tiny condensation dots scattered across */
-                radial-gradient(circle at 15% 30%, rgba(200, 230, 250, 0.4) 0%, transparent 2px),
-                radial-gradient(circle at 35% 70%, rgba(180, 220, 245, 0.35) 0%, transparent 3px),
-                radial-gradient(circle at 55% 20%, rgba(190, 225, 250, 0.3) 0%, transparent 2px),
-                radial-gradient(circle at 75% 60%, rgba(200, 235, 255, 0.4) 0%, transparent 2.5px),
-                radial-gradient(circle at 90% 40%, rgba(185, 220, 245, 0.35) 0%, transparent 2px),
-                radial-gradient(circle at 25% 50%, rgba(195, 230, 252, 0.3) 0%, transparent 1.5px),
-                radial-gradient(circle at 65% 80%, rgba(200, 230, 250, 0.25) 0%, transparent 2px),
-                radial-gradient(circle at 45% 45%, rgba(210, 240, 255, 0.35) 0%, transparent 3px),
-                radial-gradient(circle at 85% 75%, rgba(190, 225, 250, 0.3) 0%, transparent 2px),
-                radial-gradient(circle at 10% 85%, rgba(200, 235, 255, 0.4) 0%, transparent 2.5px);
-            opacity: 0.6;
+            width: 100%;
+            height: 100%;
             pointer-events: none;
-            z-index: -1;
-            animation: condensationShimmer 8s ease-in-out infinite;
+            z-index: 2;
+        }
+        
+        /* Shadow canvas for wiped areas (crater darkening effect) */
+        .shadow-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
         }
 
-        /* Frosted glass edge highlight */
+        /* Full-page water canvas - covers entire viewport, fixed position */
+        .page-water-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 95; /* Above most content but below header (z-index 100) */
+            mix-blend-mode: normal;
+            opacity: 0.92;
+        }
+        
+        /* Hide water canvas on reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            .page-water-canvas {
+                display: none;
+            }
+        }
+        
+        /* Hide water canvas on touch/no-hover devices */
+        @media (hover: none) {
+            .page-water-canvas {
+                display: none;
+            }
+        }
+
+        /* Touch / no-hover devices: disable interactive wipe effect */
+        @media (hover: none) {
+            .condensation-canvas,
+            .shadow-canvas {
+                /* Touch devices still see static condensation */
+            }
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+            .condensation-canvas,
+            .shadow-canvas {
+                /* Reduced motion - no animations */
+            }
+        }
+
+        /* Glass edge with natural water beading at bottom - crevice where water collects */
         header::after {
             content: '';
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 1px;
-            background: linear-gradient(
-                90deg,
-                transparent 0%,
-                rgba(255, 255, 255, 0.6) 20%,
-                rgba(200, 230, 250, 0.4) 50%,
-                rgba(255, 255, 255, 0.6) 80%,
-                transparent 100%
-            );
-            opacity: 0.8;
+            height: 6px;
+            pointer-events: none;
+            z-index: 2;
+            background:
+                /* Water beads forming at bottom edge - uneven spacing, more prominent */
+                radial-gradient(ellipse 4px 6px at 5% 30%, rgba(255,255,255,0.55) 0%, rgba(180,220,245,0.25) 50%, transparent 100%),
+                radial-gradient(ellipse 5px 8px at 12% 25%, rgba(255,255,255,0.6) 0%, rgba(175,215,242,0.30) 45%, transparent 100%),
+                radial-gradient(ellipse 3px 5px at 21% 35%, rgba(255,255,255,0.52) 0%, rgba(170,210,238,0.24) 50%, transparent 100%),
+                radial-gradient(ellipse 6px 10px at 32% 20%, rgba(255,255,255,0.62) 0%, rgba(178,218,245,0.32) 42%, transparent 100%),
+                radial-gradient(ellipse 4px 6px at 43% 30%, rgba(255,255,255,0.55) 0%, rgba(172,212,240,0.28) 48%, transparent 100%),
+                radial-gradient(ellipse 5px 9px at 55% 22%, rgba(255,255,255,0.58) 0%, rgba(175,215,242,0.30) 45%, transparent 100%),
+                radial-gradient(ellipse 3px 5px at 65% 32%, rgba(255,255,255,0.52) 0%, rgba(168,208,238,0.25) 50%, transparent 100%),
+                radial-gradient(ellipse 4px 7px at 76% 28%, rgba(255,255,255,0.56) 0%, rgba(175,215,242,0.28) 46%, transparent 100%),
+                radial-gradient(ellipse 5px 8px at 88% 24%, rgba(255,255,255,0.6) 0%, rgba(178,218,245,0.32) 44%, transparent 100%),
+                radial-gradient(ellipse 3px 5px at 95% 30%, rgba(255,255,255,0.54) 0%, rgba(172,212,240,0.26) 48%, transparent 100%),
+                /* Bottom edge shadow line for depth */
+                linear-gradient(
+                    180deg,
+                    transparent 0%,
+                    rgba(120, 160, 190, 0.08) 60%,
+                    rgba(100, 145, 175, 0.12) 100%
+                ),
+                /* Subtle edge highlight */
+                linear-gradient(
+                    90deg,
+                    transparent 0%,
+                    rgba(255, 255, 255, 0.28) 10%,
+                    rgba(230, 245, 255, 0.22) 30%,
+                    rgba(225, 242, 252, 0.25) 50%,
+                    rgba(230, 245, 255, 0.22) 70%,
+                    rgba(255, 255, 255, 0.28) 90%,
+                    transparent 100%
+                );
+            opacity: 0.92;
         }
 
-        @keyframes condensationShimmer {
+        /* Glass tilt illusion with micro-imperfections (chips/nicks) */
+        header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                /* Micro glass imperfections - tiny chips/nicks along edges */
+                radial-gradient(1px 1px at 3% 15%, rgba(180, 210, 230, 0.18) 0%, transparent 80%),
+                radial-gradient(0.8px 0.8px at 8% 85%, rgba(170, 200, 220, 0.15) 0%, transparent 75%),
+                radial-gradient(1.2px 1.2px at 15% 8%, rgba(160, 195, 218, 0.12) 0%, transparent 70%),
+                radial-gradient(0.6px 0.6px at 24% 92%, rgba(175, 205, 225, 0.14) 0%, transparent 78%),
+                radial-gradient(1px 1px at 38% 4%, rgba(165, 198, 220, 0.11) 0%, transparent 72%),
+                radial-gradient(0.7px 0.7px at 52% 96%, rgba(172, 202, 222, 0.13) 0%, transparent 76%),
+                radial-gradient(1.1px 1.1px at 67% 6%, rgba(168, 200, 220, 0.10) 0%, transparent 74%),
+                radial-gradient(0.9px 0.9px at 78% 88%, rgba(178, 208, 228, 0.16) 0%, transparent 77%),
+                radial-gradient(0.8px 0.8px at 85% 12%, rgba(162, 196, 218, 0.12) 0%, transparent 73%),
+                radial-gradient(1px 1px at 93% 90%, rgba(170, 200, 222, 0.14) 0%, transparent 75%),
+                radial-gradient(0.5px 0.5px at 97% 50%, rgba(165, 198, 220, 0.10) 0%, transparent 70%),
+                /* Larger subtle dust specks */
+                radial-gradient(2px 2px at 18% 30%, rgba(255, 255, 255, 0.10) 0%, transparent 70%),
+                radial-gradient(1.5px 1.5px at 46% 18%, rgba(255, 255, 255, 0.08) 0%, transparent 68%),
+                radial-gradient(2px 2px at 72% 28%, rgba(255, 255, 255, 0.07) 0%, transparent 70%),
+                /* Tilt sheen gradient - brighter edge at top */
+                linear-gradient(178deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 50%, rgba(200, 220, 235, 0.02) 100%);
+            transform-origin: center top;
+            transform: perspective(1400px) rotateX(-0.25deg) rotateY(0.4deg) translateY(-0.5px);
+            will-change: transform, opacity;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes condensationBreath {
             0%, 100% {
-                opacity: 0.5;
-                transform: translateY(0);
+                opacity: 0.95;
             }
-            50% {
-                opacity: 0.7;
-                transform: translateY(0.5px);
+            30% {
+                opacity: 1;
+            }
+            60% {
+                opacity: 0.92;
+            }
+            80% {
+                opacity: 0.98;
             }
         }
 
         header.scrolled {
-            background: linear-gradient(
-                180deg,
-                rgba(255, 255, 255, 0.92) 0%,
-                rgba(245, 252, 255, 0.88) 50%,
-                rgba(235, 248, 255, 0.85) 100%
-            );
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            /* Keep glass appearance stable on scroll: only add elevation shadow */
             box-shadow:
-                0 4px 20px rgba(8, 145, 178, 0.08),
-                0 1px 3px rgba(0, 0, 0, 0.05);
+                inset 0 -1px 0 rgba(255, 255, 255, 0.12),
+                inset 0 1px 2px rgba(255, 255, 255, 0.06),
+                0 4px 24px rgba(8, 145, 178, 0.14),
+                0 1px 4px rgba(0, 40, 60, 0.08);
         }
 
-        header.scrolled::before {
-            opacity: 0.8;
+        header.scrolled .condensation-canvas {
+            /* No scroll-based opacity change for condensation */
         }
 
         header.scrolled::after {
-            background: linear-gradient(
-                90deg,
-                transparent 0%,
-                rgba(8, 145, 178, 0.2) 20%,
-                rgba(6, 182, 212, 0.15) 50%,
-                rgba(8, 145, 178, 0.2) 80%,
-                transparent 100%
-            );
+            /* Keep same edge highlight on scroll for visual stability */
         }
 
         /* Header CTA - prominent on scroll */
         header.scrolled .header-cta {
             background: linear-gradient(135deg, var(--color-accent), #0E7490);
             color: white;
-            box-shadow: 0 4px 16px rgba(8, 145, 178, 0.3);
+            box-shadow: 0 4px 18px rgba(8, 145, 178, 0.35);
         }
 
         .nav-container {
@@ -990,6 +1094,8 @@
             justify-content: space-between;
             align-items: center;
             width: 100%;
+            position: relative;
+            z-index: 10; /* Ensure nav content is above condensation layer */
         }
 
         .logo {
@@ -3657,22 +3763,25 @@
     <div class="satellite-droplet" id="satellite1"></div>
     <div class="satellite-droplet" id="satellite2"></div>
     <div class="satellite-droplet" id="satellite3"></div>
+    <canvas id="pageWaterCanvas" class="page-water-canvas"></canvas>
 
     <header id="header">
+        <canvas class="condensation-canvas" id="condensationCanvas"></canvas>
+        <canvas class="shadow-canvas" id="shadowCanvas"></canvas>
         <div class="container nav-container">
             <div class="logo">SmartSplash™</div>
             <!-- Mobile hamburger menu button -->
-            <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="mainNav">
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="mainNav" data-analytics-id="nav_mobile_menu_toggle">
                 <span class="hamburger-line"></span>
                 <span class="hamburger-line"></span>
                 <span class="hamburger-line"></span>
             </button>
             <nav class="nav-links" id="mainNav" aria-label="Main navigation">
-                <a href="#how-it-works">How It Works</a>
-                <a href="#reviews">Reviews</a>
-                <a href="#faq">FAQ</a>
+                <a href="#how-it-works" data-analytics-id="nav_how_it_works">How It Works</a>
+                <a href="#reviews" data-analytics-id="nav_reviews">Reviews</a>
+                <a href="#faq" data-analytics-id="nav_faq">FAQ</a>
             </nav>
-            <a href="#buy-now" class="btn btn-primary header-cta" style="padding: 10px 24px; font-size: 0.9rem;">Buy Now</a>
+            <a href="#buy-now" class="btn btn-primary header-cta" style="padding: 10px 24px; font-size: 0.9rem;" data-analytics-id="cta_header_buy_now">Buy Now</a>
         </div>
     </header>
 
@@ -3775,8 +3884,8 @@
                 </div>
 
                 <div class="hero-actions">
-                    <a href="#buy-now" class="btn btn-cta">Keep My Shirt Dry — Save 29% Today</a>
-                    <a href="#how-it-works" class="btn btn-secondary">How It Works</a>
+                    <a href="#buy-now" class="btn btn-cta" data-analytics-id="cta_hero_primary">Keep My Shirt Dry — Save 29% Today</a>
+                    <a href="#how-it-works" class="btn btn-secondary" data-analytics-id="cta_hero_how_it_works">How It Works</a>
                 </div>
                 <div style="margin-top: 12px; font-size: 0.85rem; color: var(--color-text-muted); font-weight: 500;">
                     No outfit change, no mop required.
@@ -4023,7 +4132,7 @@
                         <span style="display: inline-block; padding: 6px 16px; background: rgba(6, 182, 212, 0.95); border-radius: 100px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 16px; color: white;">The SmartSplash™ Difference</span>
                         <h2 style="font-size: 2.5rem; margin-bottom: 16px; color: #FFFFFF; line-height: 1.2; text-shadow: 0 4px 16px rgba(0,0,0,0.9), 0 2px 8px rgba(0,0,0,0.8), 0 1px 4px rgba(0,0,0,0.7);">Dishes Done.<br>Shirt Still Dry.</h2>
                         <p style="font-size: 1.1rem; margin-bottom: 24px; line-height: 1.7; color: #FFFFFF; font-weight: 400; text-shadow: 0 4px 12px rgba(0,0,0,0.95), 0 2px 6px rgba(0,0,0,0.85), 0 1px 3px rgba(0,0,0,0.75);">Join thousands of happy customers who've said goodbye to post-dishes outfit changes and hello to a calmer, drier kitchen routine.</p>
-                        <a href="#buy-now" class="btn btn-primary" style="background: linear-gradient(135deg, #0891B2, #06B6D4); box-shadow: 0 4px 20px rgba(8, 145, 178, 0.4);">Get Yours Today</a>
+                        <a href="#buy-now" class="btn btn-primary" style="background: linear-gradient(135deg, #0891B2, #06B6D4); box-shadow: 0 4px 20px rgba(8, 145, 178, 0.4);" data-analytics-id="cta_lifestyle_get_yours">Get Yours Today</a>
                     </div>
                 </div>
             </div>
@@ -4240,7 +4349,7 @@
             
             <!-- CTA under comparison -->
             <div style="text-align: center; margin-top: 40px;" class="reveal-on-scroll">
-                <a href="#buy-now" class="btn btn-cta">Keep My Shirt Dry — Save 29% Today</a>
+                <a href="#buy-now" class="btn btn-cta" data-analytics-id="cta_comparison_primary">Keep My Shirt Dry — Save 29% Today</a>
             </div>
         </div>
     </section>
@@ -4610,9 +4719,9 @@
         <div class="container" style="text-align: center; color: var(--color-text-muted); position: relative; z-index: 1;">
             <div style="font-family: var(--font-heading); font-weight: 700; font-size: 1.5rem; color: var(--color-dark); margin-bottom: 16px;">SmartSplash™</div>
             <div style="display: flex; justify-content: center; gap: 24px; margin-bottom: 32px; font-size: 0.9rem;">
-                <a href="#" class="footer-link">Privacy Policy</a>
-                <a href="#" class="footer-link">Terms of Service</a>
-                <a href="#" class="footer-link">Contact Support</a>
+                <a href="#" class="footer-link" data-analytics-id="footer_privacy">Privacy Policy</a>
+                <a href="#" class="footer-link" data-analytics-id="footer_terms">Terms of Service</a>
+                <a href="#" class="footer-link" data-analytics-id="footer_contact">Contact Support</a>
             </div>
             <p style="font-size: 0.85rem; opacity: 0.7;">&copy; 2025 SmartSplash™. Designed for dry shirts everywhere.</p>
         </div>
@@ -6406,5 +6515,2131 @@
             }
         }
     </style>
+
+    <!-- ========================================
+         ANALYTICS TRACKING SCRIPT
+         Lightweight custom tracking for page views, clicks, orb movement, and session data
+         ======================================== -->
+    <script>
+    (function() {
+        'use strict';
+        
+        // Defensive wrapper - do not break the page if tracking fails
+        try {
+            // ========================================
+            // SESSION ID MANAGEMENT
+            // ========================================
+            function getOrCreateSessionId() {
+                var key = 'smartSplashSessionId';
+                var sessionId = null;
+                try {
+                    sessionId = localStorage.getItem(key);
+                } catch (e) {
+                    // localStorage unavailable (private mode, etc.)
+                }
+                if (!sessionId) {
+                    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+                        sessionId = crypto.randomUUID();
+                    } else {
+                        // Fallback for older browsers
+                        sessionId = 'ss_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    }
+                    try {
+                        localStorage.setItem(key, sessionId);
+                    } catch (e) {
+                        // Ignore storage errors
+                    }
+                }
+                return sessionId;
+            }
+
+            // ========================================
+            // GLOBAL TRACKING CONFIG
+            // ========================================
+            window.trackerConfig = {
+                sessionId: getOrCreateSessionId(),
+                pageUrl: window.location.href,
+                referrer: document.referrer || null,
+                userAgent: navigator.userAgent,
+                language: navigator.language || navigator.userLanguage || 'unknown',
+                timezone: (function() {
+                    try {
+                        return Intl.DateTimeFormat().resolvedOptions().timeZone;
+                    } catch (e) {
+                        return 'unknown';
+                    }
+                })()
+            };
+
+            // ========================================
+            // TRACKING COUNTERS
+            // ========================================
+            var totalClicksRecorded = 0;
+            var totalOrbSamplesRecorded = 0;
+            var pageStartTime = performance.now();
+
+            // ========================================
+            // SEND TRACKING EVENT HELPER
+            // ========================================
+            function sendTrackingEvent(eventType, data) {
+                try {
+                    var payload = {
+                        eventType: eventType,
+                        timestamp: new Date().toISOString(),
+                        sessionId: window.trackerConfig.sessionId,
+                        pageUrl: window.trackerConfig.pageUrl,
+                        referrer: window.trackerConfig.referrer,
+                        userAgent: window.trackerConfig.userAgent,
+                        language: window.trackerConfig.language,
+                        timezone: window.trackerConfig.timezone,
+                        viewport: {
+                            width: window.innerWidth,
+                            height: window.innerHeight
+                        },
+                        data: data
+                    };
+
+                    var jsonPayload = JSON.stringify(payload);
+                    var url = '/.netlify/functions/track';
+
+                    // Prefer sendBeacon for reliability (especially on page unload)
+                    if (navigator.sendBeacon) {
+                        var blob = new Blob([jsonPayload], { type: 'application/json' });
+                        var sent = navigator.sendBeacon(url, blob);
+                        if (!sent) {
+                            // Fallback to fetch if sendBeacon fails
+                            fetch(url, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: jsonPayload,
+                                keepalive: true
+                            }).catch(function() {});
+                        }
+                    } else {
+                        // Fallback for browsers without sendBeacon
+                        fetch(url, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: jsonPayload,
+                            keepalive: true
+                        }).catch(function() {});
+                    }
+                } catch (e) {
+                    // Silently fail - do not break the page
+                }
+            }
+
+            // ========================================
+            // TRACK PAGE VIEW
+            // ========================================
+            function trackPageView() {
+                sendTrackingEvent('page_view', {
+                    title: document.title,
+                    path: window.location.pathname,
+                    search: window.location.search,
+                    hash: window.location.hash
+                });
+            }
+
+            // Fire page view on DOMContentLoaded
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', trackPageView);
+            } else {
+                trackPageView();
+            }
+
+            // ========================================
+            // TRACK BUTTON CLICKS (Event Delegation)
+            // ========================================
+            document.body.addEventListener('click', function(e) {
+                try {
+                    // Find the nearest element with data-analytics-id
+                    var target = e.target;
+                    var element = null;
+                    
+                    // Walk up the DOM tree
+                    while (target && target !== document.body) {
+                        if (target.dataset && target.dataset.analyticsId) {
+                            element = target;
+                            break;
+                        }
+                        // Also catch buttons and anchor tags that might be CTAs
+                        if ((target.tagName === 'BUTTON' || target.tagName === 'A') && 
+                            target.classList && 
+                            (target.classList.contains('btn') || target.classList.contains('btn-cta') || target.classList.contains('btn-primary'))) {
+                            element = target;
+                            break;
+                        }
+                        target = target.parentElement;
+                    }
+
+                    if (element) {
+                        totalClicksRecorded++;
+                        sendTrackingEvent('click', {
+                            analyticsId: element.dataset.analyticsId || null,
+                            tagName: element.tagName,
+                            text: (element.innerText || '').slice(0, 120).trim(),
+                            id: element.id || null,
+                            className: element.className || null,
+                            href: element.href || null
+                        });
+                    }
+                } catch (e) {
+                    // Silently fail
+                }
+            }, true);
+
+            // ========================================
+            // TRACK FAQ INTERACTIONS
+            // ========================================
+            document.body.addEventListener('click', function(e) {
+                try {
+                    var target = e.target;
+                    while (target && target !== document.body) {
+                        if (target.classList && target.classList.contains('faq-question')) {
+                            var questionText = target.querySelector('.faq-question-text');
+                            sendTrackingEvent('faq_toggle', {
+                                question: questionText ? questionText.textContent.trim().slice(0, 200) : null,
+                                expanded: target.getAttribute('aria-expanded') === 'false' // Will be toggled
+                            });
+                            break;
+                        }
+                        target = target.parentElement;
+                    }
+                } catch (e) {
+                    // Silently fail
+                }
+            }, true);
+
+            // ========================================
+            // ORB / CURSOR MOVEMENT TRACKING
+            // Hooks into the existing mercury orb mousemove handling
+            // ========================================
+            var orbPathBuffer = [];
+            var orbSampleInterval = null;
+            var ORB_SAMPLE_INTERVAL_MS = 4000; // Send samples every 4 seconds
+            var MAX_POINTS_PER_SAMPLE = 100;
+
+            // Start the orb sampling interval
+            orbSampleInterval = setInterval(function() {
+                try {
+                    if (orbPathBuffer.length > 0) {
+                        totalOrbSamplesRecorded++;
+                        sendTrackingEvent('orb_path_sample', {
+                            points: orbPathBuffer.slice(0, MAX_POINTS_PER_SAMPLE),
+                            pointCount: orbPathBuffer.length,
+                            sampleNumber: totalOrbSamplesRecorded
+                        });
+                        orbPathBuffer = [];
+                    }
+                } catch (e) {
+                    // Silently fail
+                }
+            }, ORB_SAMPLE_INTERVAL_MS);
+
+            // Throttle for mouse position recording (every 50ms = 20 samples/sec max)
+            var lastOrbRecordTime = 0;
+            var ORB_RECORD_THROTTLE_MS = 50;
+
+            // Add listener for orb tracking - works alongside existing orb animation
+            document.addEventListener('mousemove', function(e) {
+                try {
+                    var now = performance.now();
+                    if (now - lastOrbRecordTime >= ORB_RECORD_THROTTLE_MS) {
+                        lastOrbRecordTime = now;
+                        // Cap buffer size to prevent memory issues
+                        if (orbPathBuffer.length < 500) {
+                            orbPathBuffer.push({
+                                x: e.clientX,
+                                y: e.clientY,
+                                t: Math.round(now)
+                            });
+                        }
+                    }
+                } catch (e) {
+                    // Silently fail
+                }
+            }, { passive: true });
+
+            // ========================================
+            // TRACK SCROLL DEPTH
+            // ========================================
+            var maxScrollDepth = 0;
+            var scrollDepthMilestones = [25, 50, 75, 90, 100];
+            var scrollMilestonesSent = {};
+
+            function calculateScrollDepth() {
+                var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                if (docHeight <= 0) return 100;
+                return Math.round((scrollTop / docHeight) * 100);
+            }
+
+            var scrollThrottleTimeout = null;
+            window.addEventListener('scroll', function() {
+                if (scrollThrottleTimeout) return;
+                scrollThrottleTimeout = setTimeout(function() {
+                    scrollThrottleTimeout = null;
+                    try {
+                        var depth = calculateScrollDepth();
+                        if (depth > maxScrollDepth) {
+                            maxScrollDepth = depth;
+                            // Check if we hit a milestone
+                            for (var i = 0; i < scrollDepthMilestones.length; i++) {
+                                var milestone = scrollDepthMilestones[i];
+                                if (depth >= milestone && !scrollMilestonesSent[milestone]) {
+                                    scrollMilestonesSent[milestone] = true;
+                                    sendTrackingEvent('scroll_depth', {
+                                        milestone: milestone,
+                                        actualDepth: depth
+                                    });
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        // Silently fail
+                    }
+                }, 200);
+            }, { passive: true });
+
+            // ========================================
+            // SESSION SUMMARY ON PAGE UNLOAD
+            // ========================================
+            function sendSessionSummary() {
+                try {
+                    // Send any remaining orb data
+                    if (orbPathBuffer.length > 0) {
+                        totalOrbSamplesRecorded++;
+                        sendTrackingEvent('orb_path_sample', {
+                            points: orbPathBuffer.slice(0, MAX_POINTS_PER_SAMPLE),
+                            pointCount: orbPathBuffer.length,
+                            sampleNumber: totalOrbSamplesRecorded,
+                            isFinal: true
+                        });
+                        orbPathBuffer = [];
+                    }
+
+                    sendTrackingEvent('session_summary', {
+                        durationMs: Math.round(performance.now() - pageStartTime),
+                        totalClicks: totalClicksRecorded,
+                        totalOrbSamples: totalOrbSamplesRecorded,
+                        maxScrollDepth: maxScrollDepth,
+                        scrollMilestones: Object.keys(scrollMilestonesSent).map(Number)
+                    });
+                } catch (e) {
+                    // Silently fail
+                }
+            }
+
+            // Use visibilitychange (more reliable) and beforeunload (fallback)
+            document.addEventListener('visibilitychange', function() {
+                if (document.visibilityState === 'hidden') {
+                    sendSessionSummary();
+                }
+            });
+
+            window.addEventListener('beforeunload', function() {
+                sendSessionSummary();
+            });
+
+            // Clean up interval on page unload
+            window.addEventListener('pagehide', function() {
+                if (orbSampleInterval) {
+                    clearInterval(orbSampleInterval);
+                }
+            });
+
+        } catch (e) {
+            // Top-level catch - ensure nothing breaks the page
+            console.warn('Tracking initialization failed:', e);
+        }
+    })();
+
+    // ========================================
+    // UNIFIED WATER SYSTEM
+    // One continuous simulation: glass shelf → overflow → page ground
+    // Features: Single waterDrops array, natural overflow, perspective,
+    // cursor emission everywhere, merging, scroll slosh
+    // ========================================
+    (function initUnifiedWaterSystem() {
+        const header = document.getElementById('header');
+        const condCanvas = document.getElementById('condensationCanvas');
+        const shadowCanvas = document.getElementById('shadowCanvas');
+        const pageCanvas = document.getElementById('pageWaterCanvas');
+        
+        if (!header || !condCanvas || !shadowCanvas || !pageCanvas) return;
+        
+        const condCtx = condCanvas.getContext('2d');
+        const shadowCtx = shadowCanvas.getContext('2d');
+        const pageCtx = pageCanvas.getContext('2d');
+        
+        const mediaHoverNone = window.matchMedia && window.matchMedia('(hover: none)').matches;
+        const reducedMotionSetting = typeof prefersReducedMotion !== 'undefined'
+            ? prefersReducedMotion
+            : (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+        const interactive = !(mediaHoverNone || reducedMotionSetting);
+        
+        // =============================================
+        // CONFIGURATION
+        // =============================================
+        
+        // --- Condensation ---
+        const SPOT_COUNT = 450;
+        const COND_MIN_SIZE = 2.5;
+        const COND_MAX_SIZE = 28;
+        
+        // --- Wipe/brush ---
+        const WIPE_RADIUS = 80;
+        const WIPE_STRENGTH = 0.032;
+        const WIPE_RESIDUE = 0.85;
+        const WIPE_RECOVERY_RATE = 0.00012;
+        const WIPE_RECOVERY_HOLD = 200;
+        const WIPE_DWELL_BOOST = 1.45;
+        const WIPE_PASS_BOOST = 1.0;
+        
+        // --- Shadow/crater ---
+        const SHADOW_MAX_ALPHA = 0.10;
+        const SHADOW_SPREAD = 1.25;
+        const SHADOW_JITTER = 25;
+        const MAX_SHADOWS = 35;
+        const SHADOW_LIFETIME = 2800;
+        
+        // --- UNIFIED WATER ---
+        const MAX_WATER_DROPS = 80;
+        const WATER_MIN_RADIUS = 2;
+        const WATER_MAX_RADIUS = 6;
+        const WATER_LIFETIME = 12000;
+        
+        // --- Shelf (glass) physics ---
+        const SHELF_SLOPE_X = 0;
+        const SHELF_SLOPE_Y = 0.0003;
+        const SHELF_FRICTION = 0.997;
+        const SHELF_STICK_TIME = 500;
+        const SHELF_FRONT_BUFFER = 8;
+        const SHELF_OVERFLOW_BOOST = 0.02;
+        
+        // --- Ground (page) physics ---
+        const GRAVITY = 0.0018;
+        const GROUND_FRICTION = 0.994;
+        const GROUND_SLOPE_X = 0.00015;
+        const GROUND_SLOPE_Y = 0.0004;
+        const GROUND_Y_RATIO = 0.88;
+        
+        // --- Cursor ---
+        const CURSOR_EMIT_BASE = 0.035;
+        const CURSOR_EMIT_HEADER = 0.052;
+        const CURSOR_REPULSE_RADIUS = 100;
+        const CURSOR_REPULSE_FORCE = 0.015;
+        
+        // --- Merging ---
+        const MERGE_DISTANCE = 8;
+        const MERGE_RADIUS_FACTOR = 0.7;
+        const MAX_MERGE_CHECKS = 25;
+        
+        // --- Scroll ---
+        const SCROLL_FORCE = 1.5;
+        const SCROLL_SLOSH_THRESHOLD = 0.2;
+        const SCROLL_SPILL_THRESHOLD = 0.35;
+        
+        // --- Perspective ---
+        const PERSPECTIVE_TOP = 0.82;
+        const PERSPECTIVE_MID = 1.0;
+        const PERSPECTIVE_BOTTOM = 1.12;
+        
+        // --- Fluid band (shelf edge pool) ---
+        const FLUID_SEGMENTS = 48;
+        const FLUID_DAMPING = 0.975;
+        const FLUID_STIFFNESS = 0.16;
+        const FLUID_SPREAD = 0.28;
+        const FLUID_BASE_HEIGHT = 6;
+        const FLUID_SPILL_THRESHOLD = 12;
+        const FLUID_SCROLL_MULT = 2.0;
+        
+        // --- Condensation shimmer ---
+        const SHIMMER_SPEED = 0.0004;
+        const SHIMMER_AMPLITUDE = 0.035;
+        const EQUILIBRIUM_RADIUS = 110;
+        const RIPPLE_SPEED = 0.00028;
+        const RIPPLE_SCALE = 0.0014;
+        
+        // --- Regrowth ---
+        const NEW_COND_CHANCE = 0.0032;
+        const NEW_COND_RATE = 0.0035;
+        const MAX_NEW_OPACITY = 0.48;
+        const MIN_BASE_OPACITY = 0.18;
+        const REGROW_DELAY = 1600;
+        const REGROW_VARIANCE = 1400;
+        const RESPREAD_MIN = 14;
+        const RESPREAD_MAX = 38;
+        const MAX_RECENT_WIPES = 50;
+        
+        // --- Hover tint ---
+        const HOVER_FADE_RAMP = 3200;
+        const HOVER_FADE_DECAY = 1800;
+        
+        // =============================================
+        // STATE
+        // =============================================
+        
+        // Condensation
+        let condensationSpots = [];
+        let dynamicShadows = [];
+        let recentWipeZones = [];
+        
+        // UNIFIED WATER - single array for ALL water
+        // Each drop: { x, y, vx, vy, radius, alpha, onShelf, lifetime, stickStart, gloss }
+        let waterDrops = [];
+        
+        // Fluid band at shelf front edge
+        let fluidHeights = [];
+        let fluidVelocities = [];
+        
+        // Cursor
+        let cursorX = -1000;
+        let cursorY = -1000;
+        let lastCursorX = -1000;
+        let lastCursorY = -1000;
+        let cursorVx = 0;
+        let cursorVy = 0;
+        let isHoveringHeader = false;
+        
+        // Timing
+        let time = 0;
+        let lastTime = performance.now();
+        let frameCount = 0;
+        let hoverTime = 0;
+        let lightPhase = 0;
+        
+        // Dimensions
+        let headerWidth = 0;
+        let headerHeight = 0;
+        let pageWidth = window.innerWidth;
+        let pageHeight = window.innerHeight;
+        let shelfTopY = 0;
+        let shelfBottomY = 80;
+        let groundY = 0;
+        let dpr = 1;
+        
+        // Scroll
+        let lastScrollY = window.pageYOffset || 0;
+        let scrollSpeed = 0;
+        
+        // =============================================
+        // UTILITIES
+        // =============================================
+        
+        function clamp(val, min, max) {
+            return Math.max(min, Math.min(max, val));
+        }
+
+        function noise(x, y, t) {
+            const nx = x * RIPPLE_SCALE + t;
+            const ny = y * RIPPLE_SCALE + t * 0.7;
+            return Math.sin(nx) * Math.cos(ny) * 0.5 + 0.5;
+        }
+        
+        function seededRandom(seed) {
+            const x = Math.sin(seed) * 10000;
+            return x - Math.floor(x);
+        }
+        
+        function dist(x1, y1, x2, y2) {
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+        
+        function depthFactor(y) {
+            const ratio = y / pageHeight;
+            if (ratio < 0.25) {
+                return PERSPECTIVE_TOP + (PERSPECTIVE_MID - PERSPECTIVE_TOP) * (ratio / 0.25);
+            } else if (ratio < 0.65) {
+                return PERSPECTIVE_MID;
+            } else {
+                return PERSPECTIVE_MID + (PERSPECTIVE_BOTTOM - PERSPECTIVE_MID) * ((ratio - 0.65) / 0.35);
+            }
+        }
+        
+        // =============================================
+        // CONDENSATION HELPERS
+        // =============================================
+        
+        function generateOctagonalShape(baseRadius, seed) {
+            const points = [];
+            const sides = 7 + Math.floor(seededRandom(seed) * 3);
+            const irregularity = 0.35 + seededRandom(seed + 0.5) * 0.45;
+            const angleOffset = seededRandom(seed + 0.3) * Math.PI * 0.25;
+            
+            for (let i = 0; i < sides; i++) {
+                const baseAngle = (i / sides) * Math.PI * 2 - Math.PI / 2 + angleOffset;
+                const angularJitter = (seededRandom(seed + i * 2.7) - 0.5) * 0.15;
+                const angle = baseAngle + angularJitter;
+                const radiusVariation = 1 + (seededRandom(seed + i) - 0.5) * irregularity;
+                const r = baseRadius * radiusVariation;
+                points.push({ x: Math.cos(angle) * r, y: Math.sin(angle) * r });
+            }
+            return points;
+        }
+        
+        function drawPolygon(ctx, points, fillStyle) {
+            if (points.length < 3) return;
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, points[0].y);
+            for (let i = 1; i < points.length; i++) {
+                ctx.lineTo(points[i].x, points[i].y);
+            }
+            ctx.closePath();
+            ctx.fillStyle = fillStyle;
+            ctx.fill();
+        }
+        
+        function sizeFromRandom(randVal) {
+            if (randVal < 0.5) {
+                return COND_MIN_SIZE + (7 - COND_MIN_SIZE) * (randVal / 0.5);
+            } else if (randVal < 0.85) {
+                return 7 + (15 - 7) * ((randVal - 0.5) / 0.35);
+            }
+            return 15 + (COND_MAX_SIZE - 15) * ((randVal - 0.85) / 0.15);
+        }
+
+        function createRandomSpot(baseX, baseY, spreadRadius) {
+            const angle = Math.random() * Math.PI * 2;
+            const d = Math.random() * spreadRadius;
+            const x = baseX + Math.cos(angle) * d;
+            const y = baseY + Math.sin(angle) * d;
+            const sizeRand = Math.random();
+            const size = sizeFromRandom(sizeRand);
+            const seed = Math.random() * 10000;
+            const baseOpacity = MIN_BASE_OPACITY + Math.random() * (MAX_NEW_OPACITY - MIN_BASE_OPACITY);
+            return {
+                x: clamp(x, 0, headerWidth),
+                y: clamp(y, 0, headerHeight),
+                size: size,
+                shapePoints: generateOctagonalShape(size / 2, seed),
+                baseOpacity: baseOpacity,
+                currentOpacity: 0,
+                targetOpacity: baseOpacity,
+                wipedAmount: 0,
+                breathPhase: Math.random() * Math.PI * 2,
+                seed: seed,
+                isNew: true,
+                fadeInProgress: 0,
+                lastTouched: time,
+                regrowDelay: REGROW_DELAY + Math.random() * REGROW_VARIANCE
+            };
+        }
+        
+        function createDynamicShadow(x, y, intensity) {
+            const jitterAngle = Math.random() * Math.PI * 2;
+            const jitterDist = Math.random() * SHADOW_JITTER;
+            const shadowX = x + Math.cos(jitterAngle) * jitterDist;
+            const shadowY = y + Math.sin(jitterAngle) * jitterDist;
+            const driftAngle = Math.random() * Math.PI * 2;
+            const driftDist = 6 + Math.random() * 12;
+            return {
+                x: shadowX,
+                y: shadowY,
+                targetX: shadowX + Math.cos(driftAngle) * driftDist,
+                targetY: shadowY + Math.sin(driftAngle) * driftDist,
+                size: 5 + Math.random() * 12,
+                alpha: Math.min(SHADOW_MAX_ALPHA, intensity * SHADOW_MAX_ALPHA),
+                maxAlpha: Math.min(SHADOW_MAX_ALPHA, intensity * SHADOW_MAX_ALPHA),
+                createdAt: time,
+                lifetime: SHADOW_LIFETIME + Math.random() * 800
+            };
+        }
+        
+        // =============================================
+        // UNIFIED WATER DROPLET - Single type for all water
+        // =============================================
+        
+        function createWaterDrop(x, y, vx, vy, onShelf) {
+            const radius = WATER_MIN_RADIUS + Math.random() * (WATER_MAX_RADIUS - WATER_MIN_RADIUS);
+            return {
+                x: x,
+                y: y,
+                vx: vx || 0,
+                vy: vy || 0,
+                radius: radius,
+                alpha: 0.88 + Math.random() * 0.1,
+                onShelf: onShelf || false,
+                lifetime: 0,
+                stickStart: onShelf ? time : 0,
+                gloss: 0.4 + Math.random() * 0.35
+            };
+        }
+        
+        // Reuse weakest droplet when at capacity
+        function reuseOrCreateDrop(x, y, vx, vy, onShelf) {
+            if (waterDrops.length < MAX_WATER_DROPS) {
+                waterDrops.push(createWaterDrop(x, y, vx, vy, onShelf));
+            } else {
+                // Find weakest (lowest alpha or oldest)
+                let weakestIdx = 0;
+                let weakestScore = Infinity;
+                for (let i = 0; i < waterDrops.length; i++) {
+                    const score = waterDrops[i].alpha * 100 - waterDrops[i].lifetime * 0.01;
+                    if (score < weakestScore) {
+                        weakestScore = score;
+                        weakestIdx = i;
+                    }
+                }
+                // Replace it
+                waterDrops[weakestIdx] = createWaterDrop(x, y, vx, vy, onShelf);
+            }
+        }
+        
+        // =============================================
+        // INITIALIZATION
+        // =============================================
+        
+        function initCondensationSpots() {
+            condensationSpots = [];
+            dynamicShadows = [];
+            
+            for (let i = 0; i < SPOT_COUNT; i++) {
+                const seed = i * 127.1;
+                const x = seededRandom(seed) * headerWidth;
+                const y = seededRandom(seed + 1) * headerHeight;
+                
+                const sizeRand = seededRandom(seed + 2);
+                const size = sizeFromRandom(sizeRand);
+                
+                const baseOpacity = MIN_BASE_OPACITY + seededRandom(seed + 4) * (MAX_NEW_OPACITY - MIN_BASE_OPACITY);
+                const targetOpacity = baseOpacity * (0.9 + seededRandom(seed + 6) * 0.15);
+                
+                condensationSpots.push({
+                    x: x,
+                    y: y,
+                    size: size,
+                    shapePoints: generateOctagonalShape(size / 2, seed),
+                    baseOpacity: baseOpacity,
+                    currentOpacity: targetOpacity,
+                    targetOpacity: targetOpacity,
+                    wipedAmount: 0,
+                    breathPhase: seededRandom(seed + 5) * Math.PI * 2,
+                    seed: seed,
+                    isNew: false,
+                    fadeInProgress: 1,
+                    lastTouched: time,
+                    regrowDelay: REGROW_DELAY + seededRandom(seed + 7) * REGROW_VARIANCE
+                });
+            }
+        }
+        
+        function initFluidBand() {
+            fluidHeights = new Array(FLUID_SEGMENTS).fill(0);
+            fluidVelocities = new Array(FLUID_SEGMENTS).fill(0);
+            // Seed initial water pooled near front edge
+            addFluidMass(headerWidth * 0.3, 8);
+            addFluidMass(headerWidth * 0.6, 10);
+            addFluidMass(headerWidth * 0.8, 6);
+        }
+        
+        function initWaterDrops() {
+            waterDrops = [];
+            // Pre-seed a few drops on the shelf
+            for (let i = 0; i < 8; i++) {
+                const x = Math.random() * headerWidth;
+                const y = shelfBottomY - 10 - Math.random() * 40;
+                reuseOrCreateDrop(x, y, 0, 0, true);
+            }
+        }
+        
+        function resizeAll() {
+            dpr = window.devicePixelRatio || 1;
+            pageWidth = window.innerWidth;
+            pageHeight = window.innerHeight;
+            groundY = pageHeight * GROUND_Y_RATIO;
+            
+            // Header canvases
+            const rect = header.getBoundingClientRect();
+            headerWidth = rect.width;
+            headerHeight = rect.height;
+            shelfTopY = rect.top + window.pageYOffset;
+            shelfBottomY = rect.bottom + window.pageYOffset;
+            
+            condCanvas.width = headerWidth * dpr;
+            condCanvas.height = headerHeight * dpr;
+            condCanvas.style.width = headerWidth + 'px';
+            condCanvas.style.height = headerHeight + 'px';
+            
+            shadowCanvas.width = headerWidth * dpr;
+            shadowCanvas.height = headerHeight * dpr;
+            shadowCanvas.style.width = headerWidth + 'px';
+            shadowCanvas.style.height = headerHeight + 'px';
+            
+            condCtx.setTransform(1, 0, 0, 1, 0, 0);
+            shadowCtx.setTransform(1, 0, 0, 1, 0, 0);
+            condCtx.scale(dpr, dpr);
+            shadowCtx.scale(dpr, dpr);
+            
+            // Page water canvas
+            pageCanvas.width = pageWidth;
+            pageCanvas.height = pageHeight;
+            pageCanvas.style.width = pageWidth + 'px';
+            pageCanvas.style.height = pageHeight + 'px';
+            pageCtx.setTransform(1, 0, 0, 1, 0, 0);
+            
+            initCondensationSpots();
+            initFluidBand();
+            initWaterDrops();
+        }
+        
+        // --- Rendering ---
+        function drawCondensationSpot(ctx, spot, globalRipple) {
+            const wipeInfluence = 1 - spot.wipedAmount * WIPE_RESIDUE;
+            let alpha = spot.currentOpacity * wipeInfluence * spot.fadeInProgress;
+            
+            // Per-droplet shimmer (very subtle, like air currents)
+            const shimmer = Math.sin(time * SHIMMER_SPEED + spot.breathPhase + spot.x * 0.01) * SHIMMER_AMPLITUDE;
+            alpha += shimmer;
+            
+            // Apply global ripple
+            const rippleMod = (globalRipple - 0.5) * 0.045;
+            alpha += rippleMod;
+            
+            // Local breathing near cursor (subtle warmth effect)
+            if (isHovering) {
+                const dx = spot.x - cursorX;
+                const dy = spot.y - cursorY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist < EQUILIBRIUM_RADIUS) {
+                    const breath = Math.sin(time * 0.003 + spot.breathPhase) * 0.04;
+                    const influence = 1 - (dist / EQUILIBRIUM_RADIUS);
+                    alpha += breath * influence * 0.7;
+                }
+            }
+            
+            // Clamp alpha to narrow range (no harsh bright-white spots)
+            alpha = Math.max(0, Math.min(0.52, alpha));
+            if (alpha <= 0.008) return;
+            
+            ctx.save();
+            ctx.translate(spot.x, spot.y);
+            
+            // Time-varying specular glint direction
+            const glintPhase = time * 0.0008;
+            const glintOffsetX = -spot.size * (0.12 + Math.sin(glintPhase + spot.seed * 0.1) * 0.04);
+            const glintOffsetY = -spot.size * (0.12 + Math.cos(glintPhase * 0.7 + spot.seed * 0.1) * 0.03);
+            
+            // Main droplet gradient - wet bead on glass appearance
+            const gradient = ctx.createRadialGradient(
+                glintOffsetX, glintOffsetY, 0,
+                0, 0, spot.size / 2
+            );
+            
+            // Soft gradient: white core -> aqua mid -> transparent edge
+            gradient.addColorStop(0, `rgba(255, 255, 255, ${alpha * 0.52})`);
+            gradient.addColorStop(0.25, `rgba(240, 250, 255, ${alpha * 0.38})`);
+            gradient.addColorStop(0.5, `rgba(215, 242, 252, ${alpha * 0.22})`);
+            gradient.addColorStop(0.75, `rgba(195, 230, 248, ${alpha * 0.10})`);
+            gradient.addColorStop(1, `rgba(180, 220, 242, ${alpha * 0.03})`);
+            
+            drawPolygon(ctx, spot.shapePoints, gradient);
+            
+            // Specular highlight (responds to time/light direction)
+            if (spot.size > 4.5 && alpha > 0.18) {
+                const highlightAlpha = alpha * (0.22 + Math.sin(glintPhase * 1.3 + spot.x * 0.005) * 0.06);
+                const hGrad = ctx.createRadialGradient(
+                    glintOffsetX * 1.2, glintOffsetY * 1.2, 0,
+                    glintOffsetX * 0.5, glintOffsetY * 0.5, spot.size * 0.2
+                );
+                hGrad.addColorStop(0, `rgba(255, 255, 255, ${highlightAlpha})`);
+                hGrad.addColorStop(0.6, `rgba(255, 255, 255, ${highlightAlpha * 0.3})`);
+                hGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                ctx.beginPath();
+                ctx.arc(glintOffsetX, glintOffsetY, spot.size * 0.16, 0, Math.PI * 2);
+                ctx.fillStyle = hGrad;
+                ctx.fill();
+            }
+
+            // Subtle wet sheen streak (glassy reflection)
+            if (spot.size > 5 && alpha > 0.1) {
+                ctx.save();
+                ctx.rotate(-Math.PI / 6 + spot.seed * 0.05);
+                const streakLen = spot.size * 0.6;
+                const streakGrad = ctx.createLinearGradient(
+                    -streakLen * 0.55, -streakLen * 0.55,
+                    streakLen * 0.65, streakLen * 0.65
+                );
+                streakGrad.addColorStop(0, `rgba(255,255,255,${alpha * 0.04})`);
+                streakGrad.addColorStop(0.4, `rgba(255,255,255,${alpha * 0.14})`);
+                streakGrad.addColorStop(1, 'rgba(255,255,255,0)');
+                ctx.strokeStyle = streakGrad;
+                ctx.lineWidth = Math.max(0.5, spot.size * 0.055);
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(-streakLen * 0.45, -streakLen * 0.45);
+                ctx.lineTo(streakLen * 0.5, streakLen * 0.5);
+                ctx.stroke();
+                ctx.restore();
+            }
+            
+            ctx.restore();
+        }
+        
+        function drawDynamicShadow(ctx, shadow) {
+            if (shadow.alpha <= 0.004) return;
+            
+            ctx.save();
+            ctx.translate(shadow.x, shadow.y);
+            
+            // Soft shadow/crater darkening (smudged wet glass look)
+            const spreadSize = shadow.size * SHADOW_SPREAD;
+            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, spreadSize);
+            // Muted blue-gray tone for wet glass shadow
+            gradient.addColorStop(0, `rgba(85, 120, 145, ${shadow.alpha * 0.48})`);
+            gradient.addColorStop(0.35, `rgba(75, 112, 138, ${shadow.alpha * 0.28})`);
+            gradient.addColorStop(0.7, `rgba(68, 105, 130, ${shadow.alpha * 0.12})`);
+            gradient.addColorStop(1, 'rgba(60, 95, 120, 0)');
+            
+            ctx.beginPath();
+            ctx.arc(0, 0, spreadSize, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            
+            ctx.restore();
+        }
+
+        function spawnDroplet(x, y, strength) {
+            if (!interactiveMode) return;
+            if (waterDroplets.length >= DRIP_MAX) return;
+            
+            const angle = Math.random() * Math.PI * 2;
+            const dist = (Math.random() * 8 + 4) * strength;
+            const jitterX = x + Math.cos(angle) * dist;
+            const jitterY = y + Math.sin(angle) * dist;
+            // Larger, more visible droplets
+            const radius = 1.8 + Math.random() * 2.8 * strength;
+            
+            waterDroplets.push({
+                x: jitterX,
+                y: jitterY,
+                vx: (Math.random() - 0.5) * 0.06,
+                vy: -0.004 + Math.random() * 0.025, // Mostly upward (toward top edge)
+                r: radius,
+                alpha: 0.92,
+                gloss: Math.random() * 0.35 + 0.45, // Stronger highlights
+                flowFactor: 0.9 + Math.random() * 0.2,
+                age: 0,
+                sticking: true // Start in stick phase
+            });
+        }
+
+        function spawnSplash(x, y, baseStrength) {
+            const count = Math.max(3, Math.round(SPLASH_PARTICLES * baseStrength));
+            for (let i = 0; i < count; i++) {
+                const ang = Math.random() * Math.PI + Math.PI; // downward spread
+                const speed = 0.08 + Math.random() * 0.08 * baseStrength;
+                splashParticles.push({
+                    x,
+                    y,
+                    vx: Math.cos(ang) * speed,
+                    vy: Math.sin(ang) * speed,
+                    alpha: 0.6 + Math.random() * 0.3,
+                    r: 0.6 + Math.random() * 0.6
+                });
+            }
+        }
+
+        function drawDroplet(ctx, drop) {
+            ctx.save();
+            ctx.translate(drop.x, drop.y);
+            
+            // Time-varying light glint for wet shine effect
+            const lightGlint = 0.65 + 0.3 * Math.sin(lightPhase + drop.x * 0.003);
+            
+            // Main droplet gradient - clearly visible cyan/aqua water
+            const grad = ctx.createRadialGradient(
+                -drop.r * 0.28, -drop.r * 0.28, 0,
+                0, 0, drop.r * 1.5
+            );
+            grad.addColorStop(0, `rgba(255, 255, 255, ${drop.alpha * 0.38})`);
+            grad.addColorStop(0.3, `rgba(185, 235, 255, ${drop.alpha * 0.65})`);
+            grad.addColorStop(0.6, `rgba(120, 210, 250, ${drop.alpha * 0.42})`);
+            grad.addColorStop(0.85, `rgba(90, 190, 240, ${drop.alpha * 0.18})`);
+            grad.addColorStop(1, `rgba(75, 170, 225, 0)`);
+            
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            // Slightly elongated ellipse (teardrop-ish)
+            ctx.ellipse(0, 0, drop.r * 1.15, drop.r * 1.42, -0.15, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Strong specular highlight for visibility
+            ctx.beginPath();
+            ctx.arc(-drop.r * 0.18, -drop.r * 0.32, drop.r * 0.36, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255,255,255,${drop.alpha * drop.gloss * 0.52 * lightGlint})`;
+            ctx.fill();
+            
+            // Secondary smaller highlight
+            if (drop.r > 2) {
+                ctx.beginPath();
+                ctx.arc(drop.r * 0.15, drop.r * 0.2, drop.r * 0.18, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255,255,255,${drop.alpha * 0.15 * lightGlint})`;
+                ctx.fill();
+            }
+            
+            ctx.restore();
+        }
+
+        function drawSplash(ctx, p) {
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.fillStyle = `rgba(90, 200, 255, ${p.alpha * 0.6})`;
+            ctx.beginPath();
+            ctx.arc(0, 0, p.r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function initFluid() {
+            fluidHeights = new Array(FLUID_SEGMENTS).fill(0);
+            fluidVelocities = new Array(FLUID_SEGMENTS).fill(0);
+            // Seed initial water so band is visible on load
+            addFluidMass(canvasWidth * 0.3, 8);
+            addFluidMass(canvasWidth * 0.6, 10);
+            addFluidMass(canvasWidth * 0.8, 6);
+        }
+
+        function addFluidMass(x, amount) {
+            if (!fluidHeights.length) return;
+            const idx = clamp(Math.round((x / Math.max(1, canvasWidth)) * (FLUID_SEGMENTS - 1)), 0, FLUID_SEGMENTS - 1);
+            const spread = 2;
+            for (let i = -spread; i <= spread; i++) {
+                const k = idx + i;
+                if (k >= 0 && k < FLUID_SEGMENTS) {
+                    const falloff = 1 - Math.abs(i) / (spread + 1);
+                    fluidHeights[k] += amount * 0.55 * falloff;
+                }
+            }
+        }
+
+        function updateFluid(dt) {
+            if (!fluidHeights.length) return;
+            
+            // Wave propagation
+            const accel = new Array(FLUID_SEGMENTS).fill(0);
+            for (let i = 0; i < FLUID_SEGMENTS; i++) {
+                const left = i > 0 ? fluidHeights[i - 1] : fluidHeights[i];
+                const right = i < FLUID_SEGMENTS - 1 ? fluidHeights[i + 1] : fluidHeights[i];
+                const center = fluidHeights[i];
+                accel[i] = (left - 2 * center + right) * FLUID_STIFFNESS;
+            }
+            
+            for (let i = 0; i < FLUID_SEGMENTS; i++) {
+                fluidVelocities[i] += accel[i] * (dt / 16);
+                fluidVelocities[i] *= FLUID_DAMPING;
+            }
+            
+            // Lateral spreading
+            for (let i = 0; i < FLUID_SEGMENTS; i++) {
+                const diffLeft = i > 0 ? (fluidHeights[i] - fluidHeights[i - 1]) * FLUID_SPREAD : 0;
+                const diffRight = i < FLUID_SEGMENTS - 1 ? (fluidHeights[i] - fluidHeights[i + 1]) * FLUID_SPREAD : 0;
+                if (i > 0) fluidVelocities[i - 1] += diffLeft;
+                if (i < FLUID_SEGMENTS - 1) fluidVelocities[i + 1] += diffRight;
+            }
+            
+            // Apply scroll-based sloshing (much stronger for visible slosh)
+            const scrollMag = Math.abs(scrollSpeed);
+            const scrollImpulse = scrollSpeed * FLUID_SCROLL_INFLUENCE * 0.18;
+            
+            for (let i = 0; i < FLUID_SEGMENTS; i++) {
+                // Scroll creates wave motion across the band
+                const scrollPhase = (i / FLUID_SEGMENTS) * Math.PI;
+                fluidVelocities[i] += scrollImpulse * Math.sin(scrollPhase + time * 0.002);
+                
+                fluidHeights[i] += fluidVelocities[i];
+                // Gentle baseline decay
+                fluidHeights[i] *= 0.9991;
+            }
+
+            // Spill droplets when over threshold - can spill to PAGE or back into header
+            const step = canvasWidth / (FLUID_SEGMENTS - 1 || 1);
+            for (let i = 0; i < FLUID_SEGMENTS; i++) {
+                if (fluidHeights[i] > FLUID_SPILL_THRESHOLD) {
+                    const spillAmt = (fluidHeights[i] - FLUID_SPILL_THRESHOLD) * FLUID_SPILL_RATE;
+                    fluidHeights[i] -= spillAmt;
+                    const x = i * step;
+                    
+                    // Decide: spill to page (downward) or back into header
+                    const spillsToPage = Math.random() < FLUID_PAGE_SPILL_CHANCE || scrollMag > 0.25;
+                    
+                    if (spillsToPage && spillDroplets.length < 20) {
+                        // This droplet will fall down onto the main page
+                        // Dispatch to page water system via custom event
+                        const spillEvent = new CustomEvent('headerWaterSpill', {
+                            detail: {
+                                x: x,
+                                y: canvasHeight, // Bottom of header
+                                vx: (Math.random() - 0.5) * 0.04 + scrollSpeed * 0.08,
+                                vy: 0.06 + Math.random() * 0.04,
+                                r: 2.2 + Math.random() * 2.5
+                            }
+                        });
+                        window.dispatchEvent(spillEvent);
+                    }
+                    
+                    // Also spawn some that stay on header (fall back into glass)
+                    if (spillDroplets.length < 15 && Math.random() < 0.5) {
+                        spillDroplets.push({
+                            x,
+                            y: POOL_OFFSET_TOP + FLUID_BASE_HEIGHT + 2,
+                            vx: (Math.random() - 0.5) * 0.07,
+                            vy: 0.055 + Math.random() * 0.045,
+                            r: 1.4 + Math.random() * 1.4,
+                            alpha: 0.88,
+                            gloss: 0.55,
+                            flowFactor: 1
+                        });
+                    }
+                }
+            }
+        }
+
+        function drawFluidBand(ctx) {
+            if (!fluidHeights.length) return;
+            const step = canvasWidth / (FLUID_SEGMENTS - 1 || 1);
+            ctx.save();
+            const baseY = POOL_OFFSET_TOP;
+            
+            // Draw smooth wobbly puddle band
+            ctx.beginPath();
+            ctx.moveTo(0, baseY + FLUID_BASE_HEIGHT);
+            
+            // Use quadratic curves for smoother appearance
+            for (let i = 0; i < FLUID_SEGMENTS; i++) {
+                const x = i * step;
+                const y = baseY + FLUID_BASE_HEIGHT + clamp(fluidHeights[i], -6, 28);
+                if (i === 0) {
+                    ctx.lineTo(x, y);
+                } else {
+                    const prevX = (i - 1) * step;
+                    const prevY = baseY + FLUID_BASE_HEIGHT + clamp(fluidHeights[i - 1], -6, 28);
+                    const cpX = (prevX + x) / 2;
+                    const cpY = (prevY + y) / 2;
+                    ctx.quadraticCurveTo(prevX, prevY, cpX, cpY);
+                }
+            }
+            
+            // Close the shape
+            ctx.lineTo(canvasWidth, baseY - 6);
+            ctx.lineTo(0, baseY - 6);
+            ctx.closePath();
+            
+            // Gradient for puddle appearance
+            const grad = ctx.createLinearGradient(0, baseY - 4, 0, baseY + FLUID_BASE_HEIGHT + 20);
+            grad.addColorStop(0, 'rgba(140, 215, 248, 0.15)');
+            grad.addColorStop(0.4, 'rgba(110, 200, 245, 0.28)');
+            grad.addColorStop(0.8, 'rgba(90, 185, 235, 0.35)');
+            grad.addColorStop(1, 'rgba(75, 170, 225, 0.22)');
+            ctx.fillStyle = grad;
+            ctx.fill();
+            
+            // Subtle highlight line on top of puddle
+            ctx.beginPath();
+            ctx.moveTo(0, baseY + FLUID_BASE_HEIGHT + clamp(fluidHeights[0], -6, 28));
+            for (let i = 1; i < FLUID_SEGMENTS; i++) {
+                const x = i * step;
+                const y = baseY + FLUID_BASE_HEIGHT + clamp(fluidHeights[i], -6, 28);
+                const prevX = (i - 1) * step;
+                const prevY = baseY + FLUID_BASE_HEIGHT + clamp(fluidHeights[i - 1], -6, 28);
+                const cpX = (prevX + x) / 2;
+                const cpY = (prevY + y) / 2;
+                ctx.quadraticCurveTo(prevX, prevY, cpX, cpY);
+            }
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            
+            ctx.restore();
+        }
+
+        function addToPuddles(x, amount) {
+            addFluidMass(x, amount);
+        }
+        
+        function render() {
+            time = performance.now();
+            const delta = Math.max(8, Math.min(34, time - lastTime || 16));
+            lastTime = time;
+            frameCount++;
+            lightPhase = time * 0.001;
+            
+            condCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+            shadowCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+            
+            // Track scroll speed for puddle sloshing
+            const scrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
+            const rawScrollSpeed = (scrollY - lastScrollY) / Math.max(1, delta);
+            scrollSpeed = scrollSpeed * 0.88 + rawScrollSpeed * 0.12; // Slightly more responsive
+            lastScrollY = scrollY;
+
+            // Cursor movement detection (for dwell vs pass behavior)
+            const cursorDx = cursorX - lastCursorX;
+            const cursorDy = cursorY - lastCursorY;
+            const cursorSpeed = Math.sqrt(cursorDx * cursorDx + cursorDy * cursorDy);
+            const cursorMoved = isHovering && cursorSpeed > 2;
+            const cursorMovedFast = cursorSpeed > 8;
+            
+            recentWipeZones = recentWipeZones.filter(zone => (time - zone.t) < 3500);
+
+            // Hover-time tinting (subtle glass warming effect)
+            if (interactiveMode) {
+                // Cursor always leaks a small amount of water while hovering
+                if (isHovering && Math.random() < DRIP_CURSOR_LEAK) {
+                    spawnDroplet(cursorX, cursorY, 0.9 + Math.random() * 0.3);
+                }
+                
+                if (isHovering) {
+                    hoverTime = Math.min(HOVER_FADE_RAMP, hoverTime + delta);
+                } else {
+                    hoverTime = Math.max(0, hoverTime - delta * (HOVER_FADE_RAMP / HOVER_FADE_DECAY));
+                }
+                const hoverProgress = Math.min(1, hoverTime / HOVER_FADE_RAMP);
+                const hoverFade = Math.pow(hoverProgress, 0.6) * 0.20; // Max ~0.20
+                header.style.setProperty('--hover-fade', hoverFade.toFixed(4));
+            } else {
+                header.style.setProperty('--hover-fade', '0');
+            }
+            
+            // Update condensation spots
+            for (let i = condensationSpots.length - 1; i >= 0; i--) {
+                const spot = condensationSpots[i];
+                let replacedThisFrame = false;
+                
+                // Fade in new spots
+                if (spot.isNew && spot.fadeInProgress < 1) {
+                    spot.fadeInProgress = Math.min(1, spot.fadeInProgress + NEW_CONDENSATION_RATE);
+                    spot.currentOpacity = spot.targetOpacity * spot.fadeInProgress;
+                    if (spot.fadeInProgress >= 1) spot.isNew = false;
+                }
+                
+                // Wipe logic - LOCAL ONLY (only affects droplets within brush radius)
+                if (interactiveMode && isHovering) {
+                    const dx = spot.x - cursorX;
+                    const dy = spot.y - cursorY;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (dist < WIPE_RADIUS) {
+                        // Angular irregularity for organic brush shape
+                        const angle = Math.atan2(dy, dx);
+                        const irregularity = 1 + 0.14 * Math.cos(8 * angle) + 0.06 * Math.sin(5 * angle);
+                        const localRadius = WIPE_RADIUS * irregularity;
+                        
+                        if (dist < localRadius) {
+                            const oldWiped = spot.wipedAmount;
+                            const distanceFalloff = 1 - (dist / localRadius);
+                            
+                            // Dwell vs pass behavior: dwelling wipes more, fast pass wipes less
+                            const dwellBoost = cursorMovedFast ? WIPE_PASS_BOOST : (cursorMoved ? 1.15 : WIPE_DWELL_BOOST);
+                            
+                            // Calculate wipe amount but never remove 100%
+                            const wipeAmount = WIPE_STRENGTH * (delta / 16) * (0.75 + distanceFalloff * 0.5) * dwellBoost;
+                            spot.wipedAmount = Math.min(0.98, spot.wipedAmount + wipeAmount); // Cap at 0.98 for residue
+                            spot.lastTouched = time;
+                            
+                            // Create shadow near cursor when wiping (local darkening)
+                            if (spot.wipedAmount > oldWiped && Math.random() < 0.10 && dynamicShadows.length < MAX_SHADOWS) {
+                                dynamicShadows.push(createDynamicShadow(cursorX, cursorY, Math.min(1, spot.wipedAmount + 0.1)));
+                            }
+
+                            // Spawn water droplets from wiped condensation
+                            if (spot.wipedAmount > oldWiped && spot.wipedAmount > 0.4 && Math.random() < DRIP_SPAWN_CHANCE) {
+                                spawnDroplet(spot.x, spot.y, Math.min(1.3, spot.wipedAmount + 0.35));
+                                // Near heavy condensation, more water emission
+                                if (spot.size > 12 && Math.random() < 0.3) {
+                                    spawnDroplet(cursorX, cursorY, 1.0);
+                                }
+                            }
+
+                            // Track wipe zone for regrowth bias
+                            if (spot.wipedAmount > oldWiped && Math.random() < 0.18) {
+                                recentWipeZones.push({ x: cursorX, y: cursorY, t: time });
+                                if (recentWipeZones.length > MAX_RECENT_WIPES) {
+                                    recentWipeZones.shift();
+                                }
+                            }
+                        }
+                    }
+                }
+
+                const distFromCursor = Math.sqrt(Math.pow(spot.x - cursorX, 2) + Math.pow(spot.y - cursorY, 2));
+                // Gentle recovery and occasional respawn in a nearby ring
+                if (!isHovering || distFromCursor > WIPE_RADIUS * 0.6) {
+                    if (spot.wipedAmount > 0 && (time - spot.lastTouched) > WIPE_RECOVERY_HOLD) {
+                        spot.wipedAmount = Math.max(0, spot.wipedAmount - WIPE_RECOVERY_RATE * delta);
+                    }
+                    if (spot.wipedAmount > 0.95 && (time - spot.lastTouched) > spot.regrowDelay) {
+                        const ring = RESPREAD_MIN + Math.random() * (RESPREAD_MAX - RESPREAD_MIN);
+                        const ringAngle = Math.random() * Math.PI * 2;
+                        const baseX = spot.x + Math.cos(ringAngle) * ring;
+                        const baseY = spot.y + Math.sin(ringAngle) * ring;
+                        const replacement = createRandomSpot(baseX, baseY, 18 + Math.random() * 12);
+                        condensationSpots[i] = replacement;
+                        replacedThisFrame = true;
+                    }
+                }
+                
+                if (!replacedThisFrame) {
+                    // Draw
+                    const rippleVal = noise(spot.x, spot.y, time * RIPPLE_SPEED + spot.seed * 0.01);
+                    drawCondensationSpot(condCtx, spot, rippleVal);
+                }
+            }
+            
+            // Spawn new condensation at random positions (simulating air moisture)
+            if (interactiveMode && frameCount % 3 === 0 && Math.random() < NEW_CONDENSATION_CHANCE) {
+                let newX = Math.random() * canvasWidth;
+                let newY = Math.random() * canvasHeight;
+
+                if (recentWipeZones.length && Math.random() < 0.7) {
+                    const zone = recentWipeZones[Math.floor(Math.random() * recentWipeZones.length)];
+                    const ang = Math.random() * Math.PI * 2;
+                    const radius = WIPE_RADIUS * (1.2 + Math.random() * 1.1);
+                    newX = clamp(zone.x + Math.cos(ang) * radius, 0, canvasWidth);
+                    newY = clamp(zone.y + Math.sin(ang) * radius, 0, canvasHeight);
+                } else if (isHovering) {
+                    // Spawn slightly away from active wipe to avoid instant repetition
+                    for (let attempts = 0; attempts < 5; attempts++) {
+                        const candidateX = Math.random() * canvasWidth;
+                        const candidateY = Math.random() * canvasHeight;
+                        const distFromCursor = Math.sqrt(
+                            Math.pow(candidateX - cursorX, 2) +
+                            Math.pow(candidateY - cursorY, 2)
+                        );
+                        if (distFromCursor > WIPE_RADIUS * 1.5 && distFromCursor < WIPE_RADIUS * 3.2) {
+                            newX = candidateX;
+                            newY = candidateY;
+                            break;
+                        }
+                    }
+                }
+                
+                condensationSpots.push(createRandomSpot(newX, newY, 26));
+                
+                // Remove old spots to keep count manageable
+                if (condensationSpots.length > SPOT_COUNT + 50) {
+                    // Remove oldest fully-wiped spots first
+                    const wipedIndex = condensationSpots.findIndex(s => s.wipedAmount > 0.95);
+                    if (wipedIndex !== -1) {
+                        condensationSpots.splice(wipedIndex, 1);
+                    } else {
+                        condensationSpots.shift();
+                    }
+                }
+            }
+            
+            // Update and draw dynamic shadows
+            for (let i = dynamicShadows.length - 1; i >= 0; i--) {
+                const shadow = dynamicShadows[i];
+                
+                // Drift toward target
+                shadow.x += (shadow.targetX - shadow.x) * 0.02;
+                shadow.y += (shadow.targetY - shadow.y) * 0.02;
+                
+                // Fade based on lifetime
+                const age = time - shadow.createdAt;
+                if (age > shadow.lifetime) {
+                    shadow.alpha -= 0.0065;
+                }
+                
+                // Remove dead shadows
+                if (shadow.alpha <= 0) {
+                    dynamicShadows.splice(i, 1);
+                    continue;
+                }
+                
+                drawDynamicShadow(shadowCtx, shadow);
+            }
+            
+            // Keep shadow count manageable (limit for performance)
+            if (dynamicShadows.length > MAX_SHADOWS) {
+                dynamicShadows.splice(0, dynamicShadows.length - MAX_SHADOWS);
+            }
+
+            // Water droplets (header glass surface with creep physics)
+            if (interactiveMode) {
+                for (let i = waterDroplets.length - 1; i >= 0; i--) {
+                    const d = waterDroplets[i];
+                    d.age += delta;
+                    
+                    // Stick phase: droplets cling before sliding
+                    const isSticking = d.sticking && d.age < DRIP_STICK_DELAY;
+                    const stickMod = isSticking ? 0.12 : 1;
+                    
+                    // Exit stick phase after delay
+                    if (d.sticking && d.age >= DRIP_STICK_DELAY) {
+                        d.sticking = false;
+                    }
+                    
+                    // Gentle cursor influence (pushes droplets)
+                    const dx = d.x - cursorX;
+                    const dy = d.y - cursorY;
+                    const dist2 = dx * dx + dy * dy;
+                    if (isHovering && dist2 < (WIPE_RADIUS * WIPE_RADIUS * 0.6)) {
+                        const dist = Math.sqrt(dist2) + 0.001;
+                        const push = DRIP_PULL * (1 - dist / (WIPE_RADIUS * 0.75));
+                        d.vx += (dx / dist) * push * -0.85;
+                        d.vy += (dy / dist) * push * -0.35;
+                    }
+                    
+                    // Physics: gravity (upward toward top edge), drift, friction
+                    const sizeDrift = d.r * 0.0001 * stickMod; // Larger drops drift faster
+                    d.vy += (DRIP_GRAVITY * delta + DRIP_FLOW * d.flowFactor + sizeDrift) * stickMod;
+                    d.vx += DRIP_LATERAL * stickMod;
+                    
+                    // Scroll influence on glass droplets
+                    d.vy += scrollSpeed * 0.45;
+                    d.vx += scrollSpeed * 0.12 * Math.sin(d.x * 0.02);
+                    
+                    // High friction = slow creep
+                    d.vx *= DRIP_FRICTION;
+                    d.vy *= DRIP_FRICTION;
+                    
+                    // Apply movement
+                    d.x += d.vx * delta * 0.88;
+                    d.y += d.vy * delta * 0.88;
+                    
+                    // Slow alpha decay for visibility
+                    d.alpha = Math.max(0.38, d.alpha * 0.9996);
+
+                    // Reach top edge = contribute to puddle (crevice)
+                    if (d.y <= POOL_OFFSET_TOP + d.r + 2) {
+                        const impact = Math.min(1, Math.abs(d.vy) * 12);
+                        addToPuddles(d.x, d.r * 1.1 + impact * 0.4);
+                        spawnSplash(d.x, POOL_OFFSET_TOP + 2, impact * 0.7);
+                        waterDroplets.splice(i, 1);
+                        continue;
+                    }
+                    
+                    // Reach bottom edge = SPILL onto page
+                    if (d.y >= canvasHeight - d.r - 2) {
+                        // Dispatch to page water system
+                        const spillEvent = new CustomEvent('headerWaterSpill', {
+                            detail: {
+                                x: d.x,
+                                y: canvasHeight,
+                                vx: d.vx * 0.8,
+                                vy: Math.max(0.035, d.vy * 0.6 + 0.02),
+                                r: d.r * 1.05
+                            }
+                        });
+                        window.dispatchEvent(spillEvent);
+                        waterDroplets.splice(i, 1);
+                        continue;
+                    }
+                    
+                    // Out of bounds (sides only - can't exit top/bottom now)
+                    if (d.x < -15 || d.x > canvasWidth + 15) {
+                        waterDroplets.splice(i, 1);
+                        continue;
+                    }
+                    
+                    // Age/fade out
+                    if (d.alpha < 0.08 || d.age > 3800) {
+                        addToPuddles(d.x, d.r * 0.5);
+                        waterDroplets.splice(i, 1);
+                        continue;
+                    }
+                    
+                    drawDroplet(condCtx, d);
+                }
+
+                // Splash particles
+                for (let i = splashParticles.length - 1; i >= 0; i--) {
+                    const p = splashParticles[i];
+                    p.x += p.vx * delta * 0.85;
+                    p.y += p.vy * delta * 0.85;
+                    p.alpha *= SPLASH_DECAY;
+                    p.r *= 0.988;
+                    if (p.alpha < 0.015) {
+                        splashParticles.splice(i, 1);
+                        continue;
+                    }
+                    drawSplash(condCtx, p);
+                }
+                
+                // Spill droplets (from fluid band overflow) - can fall onto page
+                for (let i = spillDroplets.length - 1; i >= 0; i--) {
+                    const d = spillDroplets[i];
+                    // Stronger gravity for spill droplets (falling)
+                    d.vy += 0.00055 * delta;
+                    d.vx *= DRIP_FRICTION * 0.995;
+                    d.vy *= DRIP_FRICTION * 0.998;
+                    d.x += d.vx * delta * 0.9;
+                    d.y += d.vy * delta * 0.9;
+                    d.alpha = Math.max(0.28, d.alpha * 0.9993);
+                    
+                    // Reaches bottom of header - spill onto PAGE
+                    if (d.y >= canvasHeight - 2) {
+                        // Dispatch to page water system
+                        const spillEvent = new CustomEvent('headerWaterSpill', {
+                            detail: {
+                                x: d.x,
+                                y: canvasHeight,
+                                vx: d.vx * 1.2,
+                                vy: Math.max(0.04, d.vy * 0.8),
+                                r: d.r * 1.1
+                            }
+                        });
+                        window.dispatchEvent(spillEvent);
+                        spillDroplets.splice(i, 1);
+                        continue;
+                    }
+                    
+                    // Hit sides or fade out
+                    if (d.alpha < 0.05 || d.x < -20 || d.x > canvasWidth + 20) {
+                        spillDroplets.splice(i, 1);
+                        continue;
+                    }
+                    drawDroplet(condCtx, d);
+                }
+                
+                // Update and draw puddle band
+                updateFluid(delta);
+                drawFluidBand(condCtx);
+                
+                // Reduce condensation brightness under thick puddle areas
+                // (water absorbs mist effect)
+                // This is handled implicitly by the alpha clamping in drawCondensationSpot
+            }
+            
+            lastCursorX = cursorX;
+            lastCursorY = cursorY;
+            
+            if (interactiveMode) {
+                requestAnimationFrame(render);
+            }
+        }
+        
+        // --- Events ---
+        function handleMouseMove(e) {
+            const rect = header.getBoundingClientRect();
+            cursorX = e.clientX - rect.left;
+            cursorY = e.clientY - rect.top;
+        }
+        
+        function handleMouseEnter(e) {
+            isHovering = true;
+            handleMouseMove(e);
+        }
+        
+        function handleMouseLeave() {
+            isHovering = false;
+            cursorX = -1000;
+            cursorY = -1000;
+        }
+        
+        // --- Init ---
+        resizeCanvases();
+        render();
+        
+        if (interactiveMode) {
+            header.addEventListener('mousemove', handleMouseMove, { passive: true });
+            header.addEventListener('mouseenter', handleMouseEnter, { passive: true });
+            header.addEventListener('mouseleave', handleMouseLeave, { passive: true });
+        }
+        
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                resizeCanvases();
+                if (!interactiveMode) render();
+            }, 150);
+        }, { passive: true });
+        
+        if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+            header.removeEventListener('mousemove', handleMouseMove);
+            header.removeEventListener('mouseenter', handleMouseEnter);
+            header.removeEventListener('mouseleave', handleMouseLeave);
+        }
+    })();
+    </script>
+    <script>
+    // ========================================
+    // FULL-PAGE WATER PHYSICS SYSTEM
+    // Features: Strong gravity, top barrier, glass-to-page spills,
+    // cursor emission everywhere, droplet merging, pools, scroll motion
+    // ========================================
+    (function initFullPageWater() {
+        const canvas = document.getElementById('pageWaterCanvas');
+        const header = document.getElementById('header');
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        const mediaHoverNone = window.matchMedia && window.matchMedia('(hover: none)').matches;
+        const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const interactive = !(mediaHoverNone || reducedMotion);
+        
+        // === CONFIGURATION ===
+        // Droplet limits (performance caps)
+        const MAX_PAGE_DROPLETS = 70;       // Max page droplets
+        const MAX_HEADER_DROPLETS = 25;     // Max header droplets (from glass)
+        const MAX_POOLS = 4;                // Max pool regions
+        const MAX_MERGE_CHECKS = 20;        // Limit merge comparisons per frame
+        
+        // Physics - STRONG GRAVITY (fix "space water" problem)
+        const GRAVITY = 0.00085;            // Strong downward acceleration
+        const FRICTION = 0.992;             // Moderate drag
+        const GLASS_SLOPE_X = 0.00008;      // Slight lateral drift on glass
+        const GLASS_SLOPE_Y = -0.00045;     // Upward drift toward top edge (glass tilt)
+        const GLASS_STICK_TIME = 400;       // ms before droplets start sliding on glass
+        const GLASS_FRICTION = 0.997;       // Higher friction on glass surface
+        
+        // Top barrier (prevents water from exiting upward)
+        const TOP_BARRIER = 2;              // Barrier Y position
+        const TOP_BOUNCE = 0.35;            // Bounce coefficient at barrier
+        
+        // Cursor emission
+        const CURSOR_EMIT_RATE = 0.042;     // Chance per frame to emit from cursor
+        const CURSOR_EMIT_RATE_HEADER = 0.068; // Higher rate when over header
+        const CURSOR_SPRAY_SPEED = 0.08;    // Initial velocity from cursor movement
+        
+        // Cursor repulsion (magnetic push)
+        const CURSOR_REPULSE_RADIUS = 120;
+        const CURSOR_REPULSE_FORCE = 0.018;
+        
+        // Scroll influence
+        const SCROLL_FORCE = 1.8;           // Force multiplier from scroll velocity
+        const SCROLL_SLOSH_THRESHOLD = 0.15; // Min scroll speed to trigger slosh
+        
+        // Droplet merging
+        const MERGE_DISTANCE = 8;           // Distance to trigger merge
+        const MERGE_RADIUS_FACTOR = 0.7;    // How much radius combines (area-based)
+        
+        // Pools
+        const POOL_ABSORB_RADIUS = 25;      // Radius around pool center to absorb droplets
+        const POOL_MAX_VOLUME = 80;         // Max volume per pool
+        const POOL_DECAY = 0.9998;          // Slow evaporation
+        const POOL_SPAWN_Y = 0.85;          // Y position ratio for bottom pools
+        
+        // Visual
+        const DROP_MIN_RADIUS = 2;
+        const DROP_MAX_RADIUS = 6;
+        const DROP_ALPHA_DECAY = 0.9997;
+        
+        // Header dimensions (will be updated)
+        let headerHeight = 80;
+        let headerBottom = 80;
+        
+        // === STATE ===
+        let pageDroplets = [];
+        let headerDroplets = [];  // Droplets on the glass (separate from page)
+        let pools = [];
+        let cw = window.innerWidth;
+        let ch = window.innerHeight;
+        let lastTime = performance.now();
+        let cursorX = -1000;
+        let cursorY = -1000;
+        let lastCursorX = -1000;
+        let lastCursorY = -1000;
+        let cursorVx = 0;
+        let cursorVy = 0;
+        let isOverHeader = false;
+        let lastScrollY = window.pageYOffset || 0;
+        let scrollSpeed = 0;
+        let lightPhase = 0;
+        
+        // === UTILITIES ===
+        function clamp(v, min, max) {
+            return Math.max(min, Math.min(max, v));
+        }
+        
+        function distance(x1, y1, x2, y2) {
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+        
+        function resize() {
+            cw = window.innerWidth;
+            ch = window.innerHeight;
+            canvas.width = cw;
+            canvas.height = ch;
+            canvas.style.width = cw + 'px';
+            canvas.style.height = ch + 'px';
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            
+            // Update header dimensions
+            if (header) {
+                const rect = header.getBoundingClientRect();
+                headerHeight = rect.height;
+                headerBottom = rect.bottom;
+            }
+            
+            // Initialize pools at bottom of page
+            initPools();
+        }
+        
+        function initPools() {
+            pools = [];
+            const poolY = ch * POOL_SPAWN_Y;
+            // Create a few pool regions across the bottom
+            const poolSpacing = cw / (MAX_POOLS + 1);
+            for (let i = 0; i < MAX_POOLS; i++) {
+                pools.push({
+                    x: poolSpacing * (i + 1) + (Math.random() - 0.5) * 40,
+                    y: poolY + Math.random() * 30,
+                    volume: 5 + Math.random() * 15,
+                    targetVolume: 5 + Math.random() * 15,
+                    wobble: Math.random() * Math.PI * 2
+                });
+            }
+        }
+        
+        // === DROPLET CREATION ===
+        function createDroplet(x, y, vx, vy, onGlass) {
+            const radius = DROP_MIN_RADIUS + Math.random() * (DROP_MAX_RADIUS - DROP_MIN_RADIUS);
+            return {
+                x: x,
+                y: y,
+                vx: vx || 0,
+                vy: vy || 0,
+                r: radius,
+                mass: radius * radius,  // Mass proportional to area
+                alpha: 0.88 + Math.random() * 0.1,
+                gloss: 0.4 + Math.random() * 0.35,
+                age: 0,
+                sticking: onGlass,
+                onGlass: onGlass || false,
+                stickStart: onGlass ? performance.now() : 0
+            };
+        }
+        
+        // Emit droplet from cursor
+        function emitFromCursor(strength) {
+            if (pageDroplets.length >= MAX_PAGE_DROPLETS) return;
+            
+            // Initial velocity based on cursor movement
+            const vx = cursorVx * CURSOR_SPRAY_SPEED * strength + (Math.random() - 0.5) * 0.04;
+            const vy = cursorVy * CURSOR_SPRAY_SPEED * strength + Math.random() * 0.02;
+            
+            const drop = createDroplet(cursorX, cursorY, vx, vy, isOverHeader);
+            
+            if (isOverHeader) {
+                headerDroplets.push(drop);
+            } else {
+                pageDroplets.push(drop);
+            }
+        }
+        
+        // Spill droplet from header onto page (glass-to-page transition)
+        function spillFromHeader(drop) {
+            // Convert header droplet to page droplet
+            drop.onGlass = false;
+            drop.sticking = false;
+            // Give it some downward velocity
+            drop.vy = Math.max(0.08, drop.vy + 0.05);
+            pageDroplets.push(drop);
+        }
+        
+        // === DROPLET MERGING ===
+        function mergeDroplets(arr) {
+            let checks = 0;
+            for (let i = arr.length - 1; i >= 1 && checks < MAX_MERGE_CHECKS; i--) {
+                const a = arr[i];
+                for (let j = i - 1; j >= 0 && checks < MAX_MERGE_CHECKS; j--) {
+                    const b = arr[j];
+                    checks++;
+                    
+                    const d = distance(a.x, a.y, b.x, b.y);
+                    const minDist = (a.r + b.r) * 0.6;
+                    
+                    if (d < minDist + MERGE_DISTANCE) {
+                        // Merge a into b
+                        const totalMass = a.mass + b.mass;
+                        
+                        // Position: weighted average
+                        b.x = (a.x * a.mass + b.x * b.mass) / totalMass;
+                        b.y = (a.y * a.mass + b.y * b.mass) / totalMass;
+                        
+                        // Velocity: momentum conservation
+                        b.vx = (a.vx * a.mass + b.vx * b.mass) / totalMass;
+                        b.vy = (a.vy * a.mass + b.vy * b.mass) / totalMass;
+                        
+                        // Radius: area-based combination
+                        const newArea = a.r * a.r + b.r * b.r;
+                        b.r = Math.min(DROP_MAX_RADIUS * 1.5, Math.sqrt(newArea) * MERGE_RADIUS_FACTOR);
+                        b.mass = b.r * b.r;
+                        
+                        // Preserve higher alpha
+                        b.alpha = Math.max(a.alpha, b.alpha);
+                        
+                        // Remove merged droplet
+                        arr.splice(i, 1);
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // === POOL INTERACTION ===
+        function checkPoolAbsorption(drop, pools) {
+            for (const pool of pools) {
+                const d = distance(drop.x, drop.y, pool.x, pool.y);
+                if (d < POOL_ABSORB_RADIUS + pool.volume * 0.2) {
+                    // Absorb into pool
+                    pool.targetVolume = Math.min(POOL_MAX_VOLUME, pool.targetVolume + drop.r * 0.8);
+                    pool.wobble += 0.3; // Ripple effect
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        // === PHYSICS UPDATE ===
+        function updateDroplet(drop, dt, isHeaderDrop) {
+            drop.age += dt;
+            
+            const now = performance.now();
+            
+            // Cursor repulsion
+            const dx = drop.x - cursorX;
+            const dy = drop.y - cursorY;
+            const dist2 = dx * dx + dy * dy;
+            
+            if (dist2 < CURSOR_REPULSE_RADIUS * CURSOR_REPULSE_RADIUS && dist2 > 1) {
+                const dist = Math.sqrt(dist2);
+                const force = CURSOR_REPULSE_FORCE * (1 - dist / CURSOR_REPULSE_RADIUS);
+                drop.vx += (dx / dist) * force;
+                drop.vy += (dy / dist) * force;
+            }
+            
+            if (isHeaderDrop && drop.onGlass) {
+                // Glass physics: stick phase, then creep toward crevice
+                const isSticking = drop.sticking && (now - drop.stickStart) < GLASS_STICK_TIME;
+                
+                if (isSticking) {
+                    // Almost no movement during stick phase
+                    drop.vx *= 0.5;
+                    drop.vy *= 0.5;
+                } else {
+                    drop.sticking = false;
+                    
+                    // Glass tilt: drift toward top edge (crevice)
+                    drop.vx += GLASS_SLOPE_X * dt;
+                    drop.vy += GLASS_SLOPE_Y * dt * (1 + drop.r * 0.02);
+                    
+                    // Higher friction on glass
+                    drop.vx *= GLASS_FRICTION;
+                    drop.vy *= GLASS_FRICTION;
+                }
+                
+                // Scroll influence on glass droplets
+                drop.vy += scrollSpeed * SCROLL_FORCE * 0.4;
+                drop.vx += scrollSpeed * SCROLL_FORCE * 0.15 * Math.sin(drop.x * 0.01);
+                
+            } else {
+                // Page physics: strong gravity
+                drop.vy += GRAVITY * dt;
+                
+                // Scroll influence
+                drop.vy += scrollSpeed * SCROLL_FORCE * 0.8;
+                
+                // Normal friction
+                drop.vx *= FRICTION;
+                drop.vy *= FRICTION;
+            }
+            
+            // Apply velocity
+            drop.x += drop.vx * dt * 0.9;
+            drop.y += drop.vy * dt * 0.9;
+            
+            // Top barrier (prevent upward exit)
+            if (drop.y < TOP_BARRIER) {
+                drop.y = TOP_BARRIER;
+                drop.vy = Math.abs(drop.vy) * TOP_BOUNCE;
+                // Slide along barrier
+                drop.vx += (Math.random() - 0.5) * 0.02;
+            }
+            
+            // Alpha decay
+            drop.alpha *= DROP_ALPHA_DECAY;
+        }
+        
+        // === DRAWING ===
+        function drawDroplet(drop) {
+            if (drop.alpha < 0.05) return;
+            
+            ctx.save();
+            ctx.translate(drop.x, drop.y);
+            
+            // Time-varying light glint
+            const glint = 0.6 + 0.35 * Math.sin(lightPhase + drop.x * 0.004);
+            
+            // Main droplet gradient - aqua/cyan water color
+            const grad = ctx.createRadialGradient(
+                -drop.r * 0.25, -drop.r * 0.25, 0,
+                0, 0, drop.r * 1.4
+            );
+            grad.addColorStop(0, `rgba(255, 255, 255, ${drop.alpha * 0.4})`);
+            grad.addColorStop(0.3, `rgba(180, 235, 255, ${drop.alpha * 0.62})`);
+            grad.addColorStop(0.55, `rgba(120, 210, 250, ${drop.alpha * 0.45})`);
+            grad.addColorStop(0.8, `rgba(85, 190, 240, ${drop.alpha * 0.22})`);
+            grad.addColorStop(1, `rgba(70, 170, 225, 0)`);
+            
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            // Slightly elongated for teardrop effect
+            ctx.ellipse(0, 0, drop.r * 1.1, drop.r * 1.35, -0.1, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Specular highlight
+            ctx.beginPath();
+            ctx.arc(-drop.r * 0.2, -drop.r * 0.3, drop.r * 0.32, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 255, 255, ${drop.alpha * drop.gloss * 0.5 * glint})`;
+            ctx.fill();
+            
+            // Secondary highlight for larger drops
+            if (drop.r > 3.5) {
+                ctx.beginPath();
+                ctx.arc(drop.r * 0.12, drop.r * 0.18, drop.r * 0.16, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${drop.alpha * 0.18 * glint})`;
+                ctx.fill();
+            }
+            
+            ctx.restore();
+        }
+        
+        function drawPool(pool) {
+            if (pool.volume < 1) return;
+            
+            ctx.save();
+            ctx.translate(pool.x, pool.y);
+            
+            // Pool wobble animation
+            const wobbleX = Math.sin(pool.wobble) * 0.08;
+            const wobbleY = Math.cos(pool.wobble * 1.3) * 0.04;
+            
+            const baseRadius = 15 + pool.volume * 0.6;
+            const rx = baseRadius * (1 + wobbleX);
+            const ry = baseRadius * 0.5 * (1 + wobbleY);
+            
+            // Pool gradient - matches droplet colors
+            const grad = ctx.createRadialGradient(
+                -rx * 0.15, -ry * 0.2, 0,
+                0, 0, rx
+            );
+            grad.addColorStop(0, `rgba(140, 220, 255, 0.35)`);
+            grad.addColorStop(0.4, `rgba(100, 200, 250, 0.28)`);
+            grad.addColorStop(0.7, `rgba(80, 185, 240, 0.18)`);
+            grad.addColorStop(1, `rgba(65, 165, 225, 0)`);
+            
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Highlight rim
+            ctx.strokeStyle = `rgba(255, 255, 255, 0.22)`;
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.ellipse(0, -ry * 0.15, rx * 0.85, ry * 0.7, 0, Math.PI * 0.1, Math.PI * 0.9);
+            ctx.stroke();
+            
+            ctx.restore();
+        }
+        
+        // === MAIN RENDER LOOP ===
+        function render() {
+            const now = performance.now();
+            let dt = now - lastTime;
+            
+            // Skip frame if too fast (throttle to ~40fps for performance)
+            if (dt < 24) {
+                requestAnimationFrame(render);
+                return;
+            }
+            
+            dt = Math.min(40, dt);
+            lastTime = now;
+            lightPhase = now * 0.0012;
+            
+            // Track scroll speed
+            const scrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
+            const rawScrollSpeed = (scrollY - lastScrollY) / Math.max(1, dt);
+            scrollSpeed = scrollSpeed * 0.88 + rawScrollSpeed * 0.12;
+            lastScrollY = scrollY;
+            
+            // Track cursor velocity
+            const cursorDx = cursorX - lastCursorX;
+            const cursorDy = cursorY - lastCursorY;
+            cursorVx = cursorVx * 0.7 + cursorDx * 0.3;
+            cursorVy = cursorVy * 0.7 + cursorDy * 0.3;
+            lastCursorX = cursorX;
+            lastCursorY = cursorY;
+            
+            // Check if cursor is over header
+            if (header) {
+                const rect = header.getBoundingClientRect();
+                isOverHeader = cursorY >= rect.top && cursorY <= rect.bottom &&
+                               cursorX >= rect.left && cursorX <= rect.right;
+                headerBottom = rect.bottom;
+            }
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, cw, ch);
+            
+            // === CURSOR EMISSION ===
+            if (cursorX > -500) {
+                const emitRate = isOverHeader ? CURSOR_EMIT_RATE_HEADER : CURSOR_EMIT_RATE;
+                if (Math.random() < emitRate) {
+                    emitFromCursor(0.8 + Math.random() * 0.4);
+                }
+            }
+            
+            // === UPDATE HEADER DROPLETS (on glass) ===
+            for (let i = headerDroplets.length - 1; i >= 0; i--) {
+                const drop = headerDroplets[i];
+                updateDroplet(drop, dt, true);
+                
+                // Check if droplet spills off glass (passes header bottom)
+                if (drop.y > headerBottom + 5) {
+                    headerDroplets.splice(i, 1);
+                    spillFromHeader(drop);
+                    continue;
+                }
+                
+                // Check if droplet reaches top crevice (absorbed into header fluid band)
+                if (drop.y < TOP_BARRIER + 8) {
+                    // Let the header's own fluid system handle this
+                    headerDroplets.splice(i, 1);
+                    continue;
+                }
+                
+                // Remove faded droplets
+                if (drop.alpha < 0.06 || drop.x < -20 || drop.x > cw + 20) {
+                    headerDroplets.splice(i, 1);
+                    continue;
+                }
+                
+                drawDroplet(drop);
+            }
+            
+            // Cap header droplets
+            while (headerDroplets.length > MAX_HEADER_DROPLETS) {
+                headerDroplets.shift();
+            }
+            
+            // === UPDATE PAGE DROPLETS ===
+            for (let i = pageDroplets.length - 1; i >= 0; i--) {
+                const drop = pageDroplets[i];
+                updateDroplet(drop, dt, false);
+                
+                // Check pool absorption
+                if (checkPoolAbsorption(drop, pools)) {
+                    pageDroplets.splice(i, 1);
+                    continue;
+                }
+                
+                // Remove out of bounds or faded
+                if (drop.y > ch + 30 || drop.x < -30 || drop.x > cw + 30 || drop.alpha < 0.05) {
+                    pageDroplets.splice(i, 1);
+                    continue;
+                }
+                
+                drawDroplet(drop);
+            }
+            
+            // Merge page droplets
+            mergeDroplets(pageDroplets);
+            
+            // Cap page droplets
+            while (pageDroplets.length > MAX_PAGE_DROPLETS) {
+                pageDroplets.shift();
+            }
+            
+            // === UPDATE POOLS ===
+            for (const pool of pools) {
+                // Animate toward target volume
+                pool.volume += (pool.targetVolume - pool.volume) * 0.04;
+                
+                // Slow decay (evaporation)
+                pool.targetVolume *= POOL_DECAY;
+                pool.targetVolume = Math.max(2, pool.targetVolume);
+                
+                // Wobble animation decay
+                pool.wobble *= 0.985;
+                pool.wobble += 0.008;
+                
+                // Scroll-induced wobble
+                if (Math.abs(scrollSpeed) > SCROLL_SLOSH_THRESHOLD) {
+                    pool.wobble += scrollSpeed * 0.15;
+                }
+                
+                drawPool(pool);
+            }
+            
+            // === SCROLL-TRIGGERED SPILLS ===
+            // Fast scroll can cause water to spill from header crevice to page
+            if (Math.abs(scrollSpeed) > 0.35 && headerDroplets.length < MAX_HEADER_DROPLETS * 0.5) {
+                if (Math.random() < Math.abs(scrollSpeed) * 0.08) {
+                    // Spawn a droplet that will immediately spill
+                    const spillX = Math.random() * cw;
+                    const spill = createDroplet(spillX, headerBottom - 5, (Math.random() - 0.5) * 0.05, 0.06, false);
+                    pageDroplets.push(spill);
+                }
+            }
+            
+            requestAnimationFrame(render);
+        }
+        
+        // === EVENT HANDLERS ===
+        function handleMouseMove(e) {
+            cursorX = e.clientX;
+            cursorY = e.clientY;
+        }
+        
+        // === HEADER SPILL EVENT HANDLER ===
+        // Listen for water spills from header crevice
+        function handleHeaderSpill(e) {
+            if (!interactive) return;
+            if (pageDroplets.length >= MAX_PAGE_DROPLETS) return;
+            
+            const d = e.detail;
+            if (!d) return;
+            
+            // Get header position to convert coordinates
+            const headerRect = header ? header.getBoundingClientRect() : { bottom: 80 };
+            
+            pageDroplets.push({
+                x: d.x,
+                y: headerRect.bottom + 2, // Start just below header
+                vx: d.vx || (Math.random() - 0.5) * 0.03,
+                vy: d.vy || 0.05,
+                r: d.r || 2.5 + Math.random() * 2,
+                mass: (d.r || 3) * (d.r || 3),
+                alpha: 0.9,
+                gloss: 0.45 + Math.random() * 0.25,
+                age: 0,
+                sticking: false,
+                onGlass: false,
+                stickStart: 0
+            });
+        }
+        
+        // === INITIALIZATION ===
+        if (interactive) {
+            resize();
+            window.addEventListener('resize', resize, { passive: true });
+            document.addEventListener('mousemove', handleMouseMove, { passive: true });
+            window.addEventListener('headerWaterSpill', handleHeaderSpill);
+            
+            // Start render loop
+            render();
+        } else {
+            // Non-interactive: just show static pools
+            resize();
+            for (const pool of pools) {
+                pool.volume = pool.targetVolume;
+                drawPool(pool);
+            }
+        }
+    })();
+    </script>
 </body>
 </html>
